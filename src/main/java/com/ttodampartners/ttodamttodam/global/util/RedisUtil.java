@@ -21,4 +21,14 @@ public class RedisUtil {
   public String getValue(String key) {
     return redisTemplate.opsForValue().get(key);
   }
+
+  public boolean keyExists(String token) {
+    /*
+    레디스의 key(지금은 token 이 key) 자체는 true 또는 false 로 가능하지만
+    redisTemplate 가 없을 경우 nullPointException 이 발생할 수 있어
+    Boolean.TRUE.equals 를 이용해 ture 일 경우 ture,
+    false 또는 null 일 경우 false 를 반환하게 만듦
+     */
+    return Boolean.TRUE.equals(redisTemplate.hasKey(token));
+  }
 }

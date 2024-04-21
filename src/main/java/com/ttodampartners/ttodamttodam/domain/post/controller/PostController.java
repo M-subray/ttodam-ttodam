@@ -4,6 +4,7 @@ import com.ttodampartners.ttodamttodam.domain.post.dto.PostCreateDto;
 import com.ttodampartners.ttodamttodam.domain.post.dto.PostDto;
 import com.ttodampartners.ttodamttodam.domain.post.dto.PostUpdateDto;
 import com.ttodampartners.ttodamttodam.domain.post.service.PostService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class PostController {
 
     @PostMapping("/post")
     public ResponseEntity<PostDto> createPost(
-            @RequestBody PostCreateDto postCreateDto
+            @RequestBody @Valid PostCreateDto postCreateDto
 //                @AuthenticationPrincipal
         ) {
 //        postService.createPost(postCreateDto);
