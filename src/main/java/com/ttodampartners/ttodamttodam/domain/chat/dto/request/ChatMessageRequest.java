@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatMessageRequest {
     public enum MessageType{
-        ENTER, TALK
+        ENTER, TALK, LEAVE
     }
 
     private MessageType type;

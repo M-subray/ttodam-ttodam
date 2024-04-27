@@ -23,6 +23,7 @@ public class ChatroomListResponse {
     private Long hostId;
     private String hostNickname;
     private int userCount;
+    private boolean ableChat = true;
     private LocalDateTime createAt;
     private LocalDateTime modifiedAt;
 }

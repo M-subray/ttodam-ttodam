@@ -58,8 +58,7 @@ public class ChatroomCreateService {
             throw new ChatroomStringException(CHATROOM_CREATE_DENIED);
         }
 
-        // 게시글 작성자 개인 채팅방 생성 방지
-        if (userId.equals(post.getUser().getId())) {
+        if (userId.equals(post.getUser().getId())) { // 게시글 작성자 개인 채팅방 생성 방지
             throw new ChatroomStringException("게시글 작성자가 개인 채팅방을 생성할 수 없습니다.");
         }
 
@@ -101,6 +100,8 @@ public class ChatroomCreateService {
         }
         // 해당 채팅방에 소속된 유저(공구 주최자, 문의자)의 프로필 정보 리스트
         List<ChatroomProfileResponse> profileList = getChatroomProfiles(members);
+
+        // 게시글 작성자에게 개인 채팅방 생성 알림 추가!!
 
         return ChatroomResponse.builder()
                 .chatroomId(chatroom.getChatroomId())

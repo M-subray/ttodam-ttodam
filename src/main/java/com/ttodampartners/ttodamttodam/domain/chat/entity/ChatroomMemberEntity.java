@@ -39,6 +39,10 @@ public class ChatroomMemberEntity {
         this.chatActive = true;
     }
 
+    public void setChatActiveFalse() {
+        this.chatActive = false;
+    }
+
     // 채팅방 정보를 ChatroomListResponse에 담아서 리턴
     public ChatroomListResponse getChatroomInfos() {
         ChatroomEntity userChatroom = this.chatroomEntity;
@@ -53,6 +57,7 @@ public class ChatroomMemberEntity {
                 .userCount(userChatroom.getUserCount())
                 .createAt(userChatroom.getCreateAt())
                 .modifiedAt(userChatroom.getModifiedAt())
+                .ableChat(this.chatActive)
                 .build();
     }
 

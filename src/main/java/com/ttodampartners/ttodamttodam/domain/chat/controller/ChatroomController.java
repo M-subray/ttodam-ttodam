@@ -40,7 +40,8 @@ public class ChatroomController {
     }
 
     @DeleteMapping("/{chatroomId}/exit") // DELETE /chatrooms/{chatroomId}/{userId}/exit (채팅방 나가기)
-    public void leaveChatroom(@PathVariable Long chatroomId, @AuthenticationPrincipal UserDetailsDto userDetailsDto) {
+    public ResponseEntity<String> leaveChatroom(@PathVariable Long chatroomId, @AuthenticationPrincipal UserDetailsDto userDetailsDto) {
         chatroomLeaveService.leaveChatroom(chatroomId, userDetailsDto.getId());
+        return ResponseEntity.ok("채팅방 나가기 성공");
     }
 }

@@ -48,4 +48,12 @@ public class ChatController {
 
         log.info("Message [{}] send by member: {}(id: {}) to chatting room id: {}", request.getContent(), request.getNickname(), user.getId(), chatroomId);
     }
+
+    /*
+        채팅방 나가기 한 후 메시지 발송 처리
+     */
+    @MessageMapping("/{chatroomId}/leave")
+    public void leave(@DestinationVariable Long chatroomId, @Valid ChatMessageRequest request) {
+        log.info("{} Left the chatroom (id : {})", request.getNickname(), chatroomId);
+    }
 }
