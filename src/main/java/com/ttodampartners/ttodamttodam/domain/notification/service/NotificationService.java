@@ -96,6 +96,10 @@ public class NotificationService {
         .build());
   }
 
+  /*
+    단체 채팅방 생성 알림
+   */
+
   public void sendNotificationForGroupChat (PostEntity post, List<UserEntity> members) {
     for (UserEntity member: members) {
       SseEmitter sseEmitter = getSseEmitter(member.getId());

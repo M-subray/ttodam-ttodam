@@ -32,12 +32,12 @@ public class ChatController {
     /*
         "/chattings/{chatroomId}/messages"로 전송되는 메시지 처리 핸들러
     */
-
     @MessageMapping("/{chatroomId}/messages")
     public void chat(@DestinationVariable Long chatroomId, @Valid ChatMessageRequest request, SimpMessageHeaderAccessor accessor) {
         // 채팅방 존재 여부 확인
         chatroomRepository.findByChatroomId(chatroomId).orElseThrow(() -> new ChatroomStringException(ErrorCode.CHATROOM_NOT_FOUND));
 
+        // 유저 정보를 가져오기 위해 헤더에서 JWT 추출
         String authToken = String.valueOf(accessor.getNativeHeader("Authorization")).substring(7);
         String userEmail = tokenProvider.parseClaims(authToken).getSubject();
         UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));

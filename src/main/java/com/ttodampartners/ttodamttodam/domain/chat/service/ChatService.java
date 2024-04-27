@@ -3,10 +3,13 @@ package com.ttodampartners.ttodamttodam.domain.chat.service;
 import com.ttodampartners.ttodamttodam.domain.chat.dto.request.ChatMessageRequest;
 import com.ttodampartners.ttodamttodam.domain.chat.entity.ChatMessageEntity;
 import com.ttodampartners.ttodamttodam.domain.chat.entity.ChatroomEntity;
+import com.ttodampartners.ttodamttodam.domain.chat.exception.ChatroomStringException;
 import com.ttodampartners.ttodamttodam.domain.chat.repository.ChatMessageRepository;
 import com.ttodampartners.ttodamttodam.domain.chat.repository.ChatroomRepository;
 import com.ttodampartners.ttodamttodam.domain.user.entity.UserEntity;
+import com.ttodampartners.ttodamttodam.domain.user.exception.UserException;
 import com.ttodampartners.ttodamttodam.domain.user.repository.UserRepository;
+import com.ttodampartners.ttodamttodam.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,8 +32,8 @@ public class ChatService {
 
     @Transactional // 채팅 메시지 저장
     public void saveChatMessage(Long chatroomId, ChatMessageRequest request, Long senderId) {
-        UserEntity user = userRepository.findById(senderId).orElseThrow(IllegalArgumentException::new);
-        ChatroomEntity chatroom = chatroomRepository.findByChatroomId(chatroomId).orElseThrow(IllegalArgumentException::new);
+        UserEntity user = userRepository.findById(senderId).orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
+        ChatroomEntity chatroom = chatroomRepository.findByChatroomId(chatroomId).orElseThrow(() -> new ChatroomStringException(ErrorCode.CHATROOM_NOT_FOUND));
 
         // CHAT_MESSAGE 테이블에 insert
         Long chatMessageId = chatMessageRepository.save(

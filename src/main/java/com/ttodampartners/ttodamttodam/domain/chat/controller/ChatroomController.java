@@ -24,7 +24,7 @@ public class ChatroomController {
     private final ChatroomCreateService chatroomCreateService;
     private final ChatroomLeaveService chatroomLeaveService;
 
-    @PostMapping // POST /chatrooms (채팅방 생성)
+    @PostMapping // POST /chatrooms (개인 채팅방 생성)
     public ResponseEntity<ChatroomResponse> createChatroom(@RequestBody ChatroomCreateRequest request, @AuthenticationPrincipal UserDetailsDto userDetailsDto) {
         Long userId = userDetailsDto.getId();
         ChatroomResponse chatroomResponse = chatroomCreateService.createChatroom(request, userId);
