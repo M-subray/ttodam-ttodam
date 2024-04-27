@@ -57,6 +57,12 @@ public class ChatroomCreateService {
         if (post.getStatus() != PostEntity.Status.IN_PROGRESS) { // '모집중' 게시글이 아닌 경우
             throw new ChatroomStringException(CHATROOM_CREATE_DENIED);
         }
+
+        // 게시글 작성자 개인 채팅방 생성 방지
+        if (userId.equals(post.getUser().getId())) {
+            throw new ChatroomStringException("게시글 작성자가 개인 채팅방을 생성할 수 없습니다.");
+        }
+
         // 게시글 작성자
         UserEntity host = userRepository.findById(post.getUser().getId()).orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
 
