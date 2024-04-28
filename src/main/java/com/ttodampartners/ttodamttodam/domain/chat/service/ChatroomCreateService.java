@@ -153,6 +153,7 @@ public class ChatroomCreateService {
                         ChatroomMemberEntity.builder()
                                 .chatroomEntity(chatroom)
                                 .userEntity(member)
+                                .chatActive(true)
                                 .build()
                 )
         ).toList();

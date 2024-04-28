@@ -41,7 +41,7 @@ public class ChatroomLeaveService {
         List<ChatroomMemberEntity> otherUsers = chatroomMemberRepository.findAllByChatroomEntity(chatroom);
         // otherUsers.isEmpty() == true일 경우 아무도 이용하지 않는 채팅방 -> 추후 삭제 로직 고민
         if (otherUsers.size() == 1) {
-            otherUsers.get(0).setChatActiveFalse();
+            otherUsers.get(0).updateChatActiveFalse();
         }
     }
 }

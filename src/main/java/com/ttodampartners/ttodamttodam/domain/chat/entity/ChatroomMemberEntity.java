@@ -35,10 +35,7 @@ public class ChatroomMemberEntity {
     @Column(name = "chat_active")
     private boolean chatActive;
 
-    public ChatroomMemberEntity(boolean chatActive) {
-        this.chatActive = true;
-    }
-    public void setChatActiveFalse() {
+    public void updateChatActiveFalse() {
         this.chatActive = false;
     }
 
