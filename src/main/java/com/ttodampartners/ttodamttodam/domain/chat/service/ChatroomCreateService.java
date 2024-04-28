@@ -96,6 +96,8 @@ public class ChatroomCreateService {
         // 해당 채팅방에 소속된 유저(공구 주최자, 문의자)의 프로필 정보 리스트
         List<ChatroomProfileResponse> profileList = getChatroomProfiles(members);
 
+        notificationService.sendNotificationForDirectChat(post, host);
+
         return ChatroomResponse.builder()
                 .chatroomId(chatroom.getChatroomId())
                 .hostId(post.getUser().getId())
@@ -137,6 +139,7 @@ public class ChatroomCreateService {
             throw new IllegalArgumentException("단체 채팅방 인원 수가 맞지 않습니다.");
         }
 
+        // 개인 채팅방 생성 알림 to 게시글 작성자
         List<ChatroomMemberEntity> chatroomMemberEntities = saveChatroomMembers(members, chatroom);
 
         // 단체 채팅방 생성 알림

@@ -40,7 +40,7 @@ public class NotificationViewService {
         .type(notificationEntity.getType())
         .createAt(notificationEntity.getCreateAt());
 
-    if (notificationEntity.getType().equals(Type.KEYWORD) || notificationEntity.getType().equals(Type.GROUPCHAT)) {
+    if (notificationEntity.getType().equals(Type.KEYWORD) || notificationEntity.getType().equals(Type.GROUPCHAT) || notificationEntity.getType().equals(Type.DIRECTCHAT)) {
       builder.postId(notificationEntity.getPost().getPostId());
     }
 

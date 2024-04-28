@@ -135,6 +135,30 @@ public class NotificationService {
         .build());
   }
 
+  public void sendNotificationForDirectChat(PostEntity post, UserEntity host) {
+    SseEmitter sseEmitter = getSseEmitter(host.getId());
+    String message = String.format("%s 게시글에 대한 문의 메시지가 도착했습니다. 채팅방 목록에서 확인해보세요!", post.getTitle());
+    saveNotificationForDirectChat(host, message, post);
+    if (sseEmitter != null) {
+      try {
+        sseEmitter.send(SseEmitter.event().
+                name("notification").
+                data(Map.of("notificationMessage", message)));
+      } catch (IOException e) {
+        throw new NotificationException(ErrorCode.SSE_SEND_FAILED);
+      }
+    }
+  }
+
+  private void saveNotificationForDirectChat(UserEntity host, String message, PostEntity post) {
+    notificationRepository.save(NotificationEntity.builder()
+            .user(host)
+            .message(message)
+            .type(Type.DIRECTCHAT)
+            .post(post)
+            .build());
+  }
+
   @Scheduled(fixedRate = 10000)
   public void sendHeartBeat() {
     long currentTime = System.currentTimeMillis();
