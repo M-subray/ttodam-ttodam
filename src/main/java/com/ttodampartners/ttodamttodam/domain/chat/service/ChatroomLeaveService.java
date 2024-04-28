@@ -14,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static com.ttodampartners.ttodamttodam.global.error.ErrorCode.CHATROOM_NOT_FOUND;
 import static com.ttodampartners.ttodamttodam.global.error.ErrorCode.USER_NOT_IN_CHATROOM;
 
@@ -35,5 +37,11 @@ public class ChatroomLeaveService {
         );
 
         chatroomMemberRepository.delete(userChatroom);
+
+        List<ChatroomMemberEntity> otherUsers = chatroomMemberRepository.findAllByChatroomEntity(chatroom);
+        // otherUsers.isEmpty() == true일 경우 아무도 이용하지 않는 채팅방 -> 추후 삭제 로직 고민
+        if (otherUsers.size() == 1) {
+            otherUsers.get(0).setChatActiveFalse();
+        }
     }
 }

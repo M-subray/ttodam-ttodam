@@ -1,7 +1,10 @@
 package com.ttodampartners.ttodamttodam.domain.chat.controller;
 
 import com.ttodampartners.ttodamttodam.domain.chat.dto.request.ChatMessageRequest;
+import com.ttodampartners.ttodamttodam.domain.chat.entity.ChatroomEntity;
+import com.ttodampartners.ttodamttodam.domain.chat.entity.ChatroomMemberEntity;
 import com.ttodampartners.ttodamttodam.domain.chat.exception.ChatroomStringException;
+import com.ttodampartners.ttodamttodam.domain.chat.repository.ChatroomMemberRepository;
 import com.ttodampartners.ttodamttodam.domain.chat.repository.ChatroomRepository;
 import com.ttodampartners.ttodamttodam.domain.chat.service.ChatService;
 import com.ttodampartners.ttodamttodam.domain.user.entity.UserEntity;
@@ -17,7 +20,11 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -47,5 +54,12 @@ public class ChatController {
         simpMessagingTemplate.convertAndSend("/chatroom/" + chatroomId, request.getContent());
 
         log.info("Message [{}] send by member: {}(id: {}) to chatting room id: {}", request.getContent(), request.getNickname(), user.getId(), chatroomId);
+    }
+
+    @MessageMapping("/user-left")
+    public void notificateLeft(@RequestParam("chatroomId") Long chatroomId, @RequestParam("leftUserId") String leftUserNickname) {
+        String message = String.format("%s님이 채팅방에서 나갔습니다.", leftUserNickname);
+        simpMessagingTemplate.convertAndSend("/chatroom/" + chatroomId, message);
+
     }
 }
