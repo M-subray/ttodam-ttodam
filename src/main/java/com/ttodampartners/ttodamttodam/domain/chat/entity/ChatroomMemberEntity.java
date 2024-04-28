@@ -35,8 +35,8 @@ public class ChatroomMemberEntity {
     @Column(name = "chat_active")
     private boolean chatActive;
 
-    public ChatroomMemberEntity(boolean chatActive) {
-        this.chatActive = true;
+    public void updateChatActiveFalse() {
+        this.chatActive = false;
     }
 
     // 채팅방 정보를 ChatroomListResponse에 담아서 리턴
@@ -53,6 +53,7 @@ public class ChatroomMemberEntity {
                 .userCount(userChatroom.getUserCount())
                 .createAt(userChatroom.getCreateAt())
                 .modifiedAt(userChatroom.getModifiedAt())
+                .ableChat(this.chatActive)
                 .build();
     }
 

@@ -43,7 +43,8 @@ public class SecurityConfig {
                 .requestMatchers("/users/post").authenticated()
                 .requestMatchers("/users/**").authenticated()
                 .requestMatchers("/notifications/**").authenticated()
-                .requestMatchers("/chatrooms/**").permitAll()
+                .requestMatchers("/chatroom/**").authenticated()
+                .requestMatchers("/chatrooms/**").authenticated()
                 .requestMatchers("/ws-chatting/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
         );
