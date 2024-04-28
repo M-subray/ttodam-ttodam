@@ -46,13 +46,9 @@ public class ChatroomController {
     }
 
     @DeleteMapping("/{chatroomId}/exit") // DELETE /chatrooms/{chatroomId}/exit (채팅방 나가기)
-    public String leaveChatroom(@PathVariable Long chatroomId, @AuthenticationPrincipal UserDetailsDto userDetailsDto, RedirectAttributes redirectAttributes) {
+    public void leaveChatroom(@PathVariable Long chatroomId, @AuthenticationPrincipal UserDetailsDto userDetailsDto) {
         Long leftUserId = userDetailsDto.getId();
         UserEntity user = userRepository.findById(leftUserId).orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
         chatroomLeaveService.leaveChatroom(chatroomId, leftUserId);
-
-        redirectAttributes.addAttribute("chatroomId", chatroomId);
-        redirectAttributes.addAttribute("leftUserNickname", user.getNickname());
-        return "redirect:/chattings/user-left";
     }
 }

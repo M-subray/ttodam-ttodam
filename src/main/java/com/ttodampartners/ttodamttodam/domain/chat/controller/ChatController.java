@@ -56,10 +56,4 @@ public class ChatController {
         log.info("Message [{}] send by member: {}(id: {}) to chatting room id: {}", request.getContent(), request.getNickname(), user.getId(), chatroomId);
     }
 
-    @MessageMapping("/user-left")
-    public void notificateLeft(@RequestParam("chatroomId") Long chatroomId, @RequestParam("leftUserId") String leftUserNickname) {
-        String message = String.format("%s님이 채팅방에서 나갔습니다.", leftUserNickname);
-        simpMessagingTemplate.convertAndSend("/chatroom/" + chatroomId, message);
-
-    }
 }
