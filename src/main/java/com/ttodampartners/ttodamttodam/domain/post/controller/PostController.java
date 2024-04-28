@@ -23,10 +23,11 @@ public class PostController {
             @AuthenticationPrincipal UserDetailsDto userDetails,
             @RequestPart(value = "imageFiles", required = false) List<MultipartFile> imageFiles,
             @RequestPart PostCreateDto postCreateDto
-        ) {
+    ) {
         Long userId = userDetails.getId();
         return ResponseEntity.ok(PostDto.of(postService.createPost(userId, imageFiles, postCreateDto)));
-       }
+    }
+
 
     @GetMapping("/post/list")
     public ResponseEntity<List<PostListDto>> getPostList(
@@ -60,9 +61,9 @@ public class PostController {
     //게시글 검색
     @GetMapping("/post/search")
     public ResponseEntity<List<PostListDto>> searchPostList(
-            @RequestParam(required = false) String search
+            @RequestParam(required = false) String word
     ){
-        List<PostListDto> searchPostList = postService.searchPostList(search);
+        List<PostListDto> searchPostList = postService.searchPostList(word);
         return ResponseEntity.ok(searchPostList);
     }
 

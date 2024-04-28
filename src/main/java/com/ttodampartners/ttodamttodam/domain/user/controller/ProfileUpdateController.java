@@ -25,6 +25,6 @@ public class ProfileUpdateController {
     profileUpdateService.profileUpdate(profileDto);
 
     log.info("프로필 수정 성공");
-    return ResponseEntity.ok().body("프로필 수정 성공");
+    return ResponseEntity.ok("프로필 수정 성공");
   }
 }

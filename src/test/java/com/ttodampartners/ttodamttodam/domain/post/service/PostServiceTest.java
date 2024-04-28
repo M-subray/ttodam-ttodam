@@ -117,7 +117,7 @@ class PostServiceTest {
         PostDetailDto testPost = postService.getPost(userId, postId);
 
         assertEquals("NONE", testPost.getLoginUserRequestStatus());
-        assertTrue(testPost.isBookmarked());
+
     }
 
     @Test

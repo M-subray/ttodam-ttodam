@@ -18,6 +18,6 @@ public class NotificationViewController {
     List<NotificationViewDto> notificationViewDtos =
         notificationViewService.notificationView();
 
-    return ResponseEntity.ok().body(notificationViewDtos);
+    return ResponseEntity.ok(notificationViewDtos);
   }
 }

@@ -56,7 +56,6 @@ public class CoordinateFinderUtil {
           throw new CoordinateException(ErrorCode.NOT_FOUND_ADDRESS);
         }
       }
-
       response.close();
       httpClient.close();
 

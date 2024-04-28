@@ -18,6 +18,6 @@ public class KeywordListController {
     List<KeywordCheckResponseDto> keywordList =
         keywordListService.getKeywordList();
 
-    return ResponseEntity.ok().body(keywordList);
+    return ResponseEntity.ok(keywordList);
   }
 }

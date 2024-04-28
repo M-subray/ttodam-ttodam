@@ -18,6 +18,6 @@ public class WithdrawController {
     withdrawService.withdraw();
 
     log.info("회원탈퇴 완료");
-    return ResponseEntity.ok().body("탈퇴 완료");
+    return ResponseEntity.ok("탈퇴 완료");
   }
 }

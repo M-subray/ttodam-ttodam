@@ -1,9 +1,7 @@
 package com.ttodampartners.ttodamttodam.domain.post.dto;
 
 import com.ttodampartners.ttodamttodam.domain.post.entity.PostEntity;
-import com.ttodampartners.ttodamttodam.domain.user.entity.UserEntity;
 import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -16,16 +14,18 @@ import java.util.stream.Collectors;
 public class PostDto {
     private Long postId;
     private Long userId;
-    private List<ProductsDto> products;
+    private PostEntity.Category category;
+    private PostEntity.Status status;
+    private PostEntity.PurchaseStatus purchaseStatus;
     private String title;
+    private LocalDateTime deadline;
     private Integer participants;
     private String place;
     private Double pLocationX;
     private Double pLocationY;
-    private LocalDateTime deadline;
-    private PostEntity.Category category;
     private String content;
     private List<String> imgUrls;
+    private List<ProductsDto> products;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -48,6 +48,8 @@ public class PostDto {
                 .createdAt(postEntity.getCreatedAt())
                 .updatedAt(postEntity.getUpdatedAt())
                 .products(products)
+                .status(postEntity.getStatus())
+                .purchaseStatus(postEntity.getPurchaseStatus())
                 .build();
     }
 

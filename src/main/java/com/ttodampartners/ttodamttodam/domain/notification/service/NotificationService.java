@@ -159,7 +159,7 @@ public class NotificationService {
             .build());
   }
 
-  @Scheduled(fixedRate = 10000)
+  @Scheduled(fixedRate = 900000)
   public void sendHeartBeat() {
     long currentTime = System.currentTimeMillis();
 

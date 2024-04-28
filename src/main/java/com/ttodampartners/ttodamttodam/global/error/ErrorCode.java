@@ -87,10 +87,9 @@ public enum ErrorCode {
   /*
   Notification Exception
    */
-  SSE_SEND_FAILED("알림 전송을 실패했습니다.")
+  SSE_SEND_FAILED("알림 전송을 실패했습니다."),
+  NOT_FOUND_NOTIFICATION("해당 알림은 이미 삭제되었습니다.")
   ;
 
-
   private final String description;
-
 }

@@ -16,9 +16,9 @@ public class PostListDto {
     private Long postId;
     private Long authorId;
     private String authorNickname;
-    private List<ProductListDto> products;
     private String title;
     private String content;
+    private List<ProductListDto> products;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

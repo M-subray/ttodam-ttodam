@@ -18,11 +18,13 @@ import com.ttodampartners.ttodamttodam.domain.request.service.RequestService;
 import com.ttodampartners.ttodamttodam.domain.user.entity.UserEntity;
 import com.ttodampartners.ttodamttodam.domain.user.exception.UserException;
 import com.ttodampartners.ttodamttodam.domain.user.repository.UserRepository;
+import com.ttodampartners.ttodamttodam.domain.user.util.AuthenticationUtil;
 import com.ttodampartners.ttodamttodam.domain.user.util.CoordinateFinderUtil;
 import com.ttodampartners.ttodamttodam.global.error.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -157,9 +159,9 @@ public class PostService {
                 .collect(Collectors.toList());
     }
 
-    public List<PostListDto> searchPostList(String search) {
+    public List<PostListDto> searchPostList(String word) {
 
-        List<PostEntity> searchPostList = postRepository.findBySearch(search);
+        List<PostEntity> searchPostList = postRepository.findBySearch(word);
 
         return searchPostList.stream()
                 .map(PostListDto::of)
@@ -176,12 +178,13 @@ public class PostService {
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
 
-        boolean isBookmarked = false;
+        Long bookmarkId = 0L;
 
-        // 북마크확인
+        // 북마크 확인
         Optional<BookmarkEntity> bookmarkOptional = bookmarkRepository.findByPost_PostIdAndUserId(postId, userId);
         if (bookmarkOptional.isPresent()) {
-            isBookmarked = true;
+            // 북마크가 존재하면 북마크 ID를 받아옴
+            bookmarkId = bookmarkOptional.get().getBookmarkId();
         }
 
         String postRoadName = roadName(post.getPlace());
@@ -217,7 +220,7 @@ public class PostService {
             }
         }
 
-        return PostDetailDto.of(post, requestList, loginUserRequestStatus,isBookmarked);
+        return PostDetailDto.of(post, requestList, loginUserRequestStatus,bookmarkId);
     }
 
     // 도로명 주소에서 -로 부분 추출

@@ -22,6 +22,6 @@ public class SignupController {
     signupService.signup(signupRequestDto);
 
     log.info("회원가입 성공, 이메일 : {}", signupRequestDto.getEmail());
-    return ResponseEntity.ok().body("회원가입 완료\n이메일 : " + signupRequestDto.getEmail());
+    return ResponseEntity.ok("회원가입 완료\n이메일 : " + signupRequestDto.getEmail());
   }
 }

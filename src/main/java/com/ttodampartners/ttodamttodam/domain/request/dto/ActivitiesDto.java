@@ -1,6 +1,5 @@
 package com.ttodampartners.ttodamttodam.domain.request.dto;
 
-import com.ttodampartners.ttodamttodam.domain.post.dto.MembersDto;
 import com.ttodampartners.ttodamttodam.domain.post.dto.ProductListDto;
 import com.ttodampartners.ttodamttodam.domain.post.entity.PostEntity;
 import com.ttodampartners.ttodamttodam.domain.request.entity.RequestEntity;
@@ -17,22 +16,19 @@ public class ActivitiesDto {
     // 현재 로그인 유저 정보
     private Long userId;
     private String userNickname;
+    private RequestEntity.RequestStatus requestStatus;
     //참여 게시글 정보
     private Long postId;
     private Long authorId;
     private String authorNickname;
-    private List<MembersDto> members;
     private String title;
     private PostEntity.Status status;
     private PostEntity.PurchaseStatus purchaseStatus;
-    private RequestEntity.RequestStatus requestStatus;
     private List<ProductListDto> products;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public static ActivitiesDto of(RequestEntity request) {
-        // 게시글의 다른 수락된 요청자들
-//        List<MembersDto> members = List.of(MembersDto.of(request.getRequestUser()));
 
         List<ProductListDto> products = request.getPost().getProducts()
                 .stream().map(ProductListDto::from).collect(Collectors.toList());
@@ -43,7 +39,6 @@ public class ActivitiesDto {
                 .postId(request.getPost().getPostId())
                 .authorId(request.getPost().getUser().getId())
                 .authorNickname(request.getPost().getUser().getNickname())
-//                .members(members)
                 .title(request.getPost().getTitle())
                 .status(request.getPost().getStatus())
                 .requestStatus(request.getRequestStatus())

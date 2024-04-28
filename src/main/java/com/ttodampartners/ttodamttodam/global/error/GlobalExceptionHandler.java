@@ -5,6 +5,7 @@ import com.ttodampartners.ttodamttodam.domain.keyword.exception.KeywordException
 import com.ttodampartners.ttodamttodam.domain.chat.dto.ChatExceptionResponse;
 import com.ttodampartners.ttodamttodam.domain.chat.exception.ChatroomException;
 import com.ttodampartners.ttodamttodam.domain.chat.exception.ChatroomStringException;
+import com.ttodampartners.ttodamttodam.domain.notification.exception.NotificationException;
 import com.ttodampartners.ttodamttodam.domain.post.exception.PostException;
 import com.ttodampartners.ttodamttodam.domain.request.exception.RequestException;
 import com.ttodampartners.ttodamttodam.domain.user.exception.AwsException;
@@ -63,6 +64,12 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(ChatroomStringException.class)
   public ResponseEntity<String> ChatroomStringExceptionHandler(ChatroomStringException e) {
+    log.error("에러코드: {}, 에러 메시지: {}", e.getErrorCode(), e.getErrorMessage());
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getErrorMessage());
+  }
+
+  @ExceptionHandler(NotificationException.class)
+  public ResponseEntity<String> NotificationExceptionHandler(NotificationException e) {
     log.error("에러코드: {}, 에러 메시지: {}", e.getErrorCode(), e.getErrorMessage());
     return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getErrorMessage());
   }

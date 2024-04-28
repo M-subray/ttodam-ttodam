@@ -23,6 +23,6 @@ public class ImageUpdateController {
     imageUpdateService.imageUpdate(file);
     log.info("프로필 사진 수정 완료");
 
-    return ResponseEntity.ok().body("정상적으로 수정되었습니다.");
+    return ResponseEntity.ok("정상적으로 수정되었습니다.");
   }
 }

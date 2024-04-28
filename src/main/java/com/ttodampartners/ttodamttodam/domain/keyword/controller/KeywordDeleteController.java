@@ -16,6 +16,6 @@ public class KeywordDeleteController {
   public ResponseEntity<String> deleteKeyword(@RequestParam("keywordId") Long keywordId) {
     keywordDeleteService.deleteKeyword(keywordId);
 
-    return ResponseEntity.ok().body("키워드가 삭제되었습니다.");
+    return ResponseEntity.ok("키워드가 삭제되었습니다.");
   }
 }
