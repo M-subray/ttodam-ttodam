@@ -42,7 +42,7 @@ public class NotificationService {
     // 현재 클라이언트를 위한 sseEmitter 객체 생성 (만료시간 한시간 설정)
     TokenSseEmitter sseEmitter = new TokenSseEmitter(EXPIRE_TIME);
     Date now = new Date();
-//    sseEmitter.setExpiredDate(now.getTime() + EXPIRE_TIME);
+    // sseEmitter.setExpiredDate(now.getTime() + EXPIRE_TIME);
     sseEmitter.setExpiredDate(now.getTime() + EXPIRE_TIME);
 
     // 연결

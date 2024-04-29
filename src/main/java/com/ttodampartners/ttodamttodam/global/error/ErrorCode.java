@@ -19,6 +19,7 @@ public enum ErrorCode {
   PERMISSION_DENIED("권한이 없습니다."),
   SOCIAL_ACCOUNTS_IMPOSSIBLE("소셜 계정은 비밀번호 설정이 불가합니다."),
   ALREADY_LOGOUT("해당 계정은 이미 로그아웃됐습니다."),
+  NOT_UPDATE_PROFILE("프로필 입력 후 사용해 주세요."),
 
   /*
   Mail Exception
