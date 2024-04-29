@@ -13,7 +13,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 public class PostDto {
     private Long postId;
-    private Long userId;
+    private Long authorId;
+    private String authorNickname;
+    private double authorManners;
     private PostEntity.Category category;
     private PostEntity.Status status;
     private PostEntity.PurchaseStatus purchaseStatus;
@@ -35,7 +37,9 @@ public class PostDto {
                 .stream().map(ProductsDto::from).collect(Collectors.toList());
         return PostDto.builder()
                 .postId(postEntity.getPostId())
-                .userId(postEntity.getUser().getId())
+                .authorId(postEntity.getUser().getId())
+                .authorNickname(postEntity.getUser().getNickname())
+                .authorManners(postEntity.getUser().getManners())
                 .title(postEntity.getTitle())
                 .participants(postEntity.getParticipants())
                 .place(postEntity.getPlace())

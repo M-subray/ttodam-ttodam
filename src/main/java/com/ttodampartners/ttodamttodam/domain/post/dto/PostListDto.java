@@ -16,6 +16,9 @@ public class PostListDto {
     private Long postId;
     private Long authorId;
     private String authorNickname;
+    private PostEntity.Category category;
+    private PostEntity.Status status;
+    private PostEntity.PurchaseStatus purchaseStatus;
     private String title;
     private String content;
     private List<ProductListDto> products;
@@ -29,6 +32,9 @@ public class PostListDto {
                 .postId(postEntity.getPostId())
                 .authorId(postEntity.getUser().getId())
                 .authorNickname(postEntity.getUser().getNickname())
+                .category(postEntity.getCategory())
+                .status(postEntity.getStatus())
+                .purchaseStatus(postEntity.getPurchaseStatus())
                 .title(postEntity.getTitle())
                 .content(postEntity.getContent())
                 .createdAt(postEntity.getCreatedAt())
