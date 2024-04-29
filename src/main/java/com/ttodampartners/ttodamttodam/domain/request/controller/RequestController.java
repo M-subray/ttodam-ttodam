@@ -3,7 +3,6 @@ package com.ttodampartners.ttodamttodam.domain.request.controller;
 import com.ttodampartners.ttodamttodam.domain.request.dto.ActivitiesDto;
 import com.ttodampartners.ttodamttodam.domain.request.dto.RequestDto;
 import com.ttodampartners.ttodamttodam.domain.request.dto.RequestSendDto;
-import com.ttodampartners.ttodamttodam.domain.request.entity.RequestEntity;
 import com.ttodampartners.ttodamttodam.domain.request.service.RequestService;
 import com.ttodampartners.ttodamttodam.global.dto.UserDetailsDto;
 import lombok.RequiredArgsConstructor;
@@ -25,11 +24,10 @@ public class RequestController {
     @PostMapping("/post/{postId}/request")
     public ResponseEntity<RequestDto> sendRequest(
             @AuthenticationPrincipal UserDetailsDto userDetails,
-            @PathVariable Long postId,
-            @RequestBody RequestSendDto requestSendDto
+            @PathVariable Long postId
         ) {
         Long userId = userDetails.getId();
-        return ResponseEntity.ok(RequestDto.of(requestService.sendRequest(userId,postId,requestSendDto)));
+        return ResponseEntity.ok(RequestDto.of(requestService.sendRequest(userId,postId)));
        }
 
     // 모집에 참여한 게시글 목록 조회 (로그인 유저가 참여요청을 보낸 모든 게시글)

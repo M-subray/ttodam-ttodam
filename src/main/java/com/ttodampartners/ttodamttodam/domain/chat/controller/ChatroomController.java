@@ -6,12 +6,17 @@ import com.ttodampartners.ttodamttodam.domain.chat.dto.response.ChatroomResponse
 import com.ttodampartners.ttodamttodam.domain.chat.service.ChatroomLeaveService;
 import com.ttodampartners.ttodamttodam.domain.chat.service.ChatroomService;
 import com.ttodampartners.ttodamttodam.domain.chat.service.ChatroomCreateService;
+import com.ttodampartners.ttodamttodam.domain.user.entity.UserEntity;
+import com.ttodampartners.ttodamttodam.domain.user.exception.UserException;
+import com.ttodampartners.ttodamttodam.domain.user.repository.UserRepository;
 import com.ttodampartners.ttodamttodam.global.dto.UserDetailsDto;
+import com.ttodampartners.ttodamttodam.global.error.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -23,6 +28,7 @@ public class ChatroomController {
     private final ChatroomService chatroomService;
     private final ChatroomCreateService chatroomCreateService;
     private final ChatroomLeaveService chatroomLeaveService;
+    private final UserRepository userRepository;
 
     @PostMapping // POST /chatrooms (채팅방 생성)
     public ResponseEntity<ChatroomResponse> createChatroom(@RequestBody ChatroomCreateRequest request, @AuthenticationPrincipal UserDetailsDto userDetailsDto) {
@@ -39,8 +45,10 @@ public class ChatroomController {
         return ResponseEntity.ok(chatroomListResponses);
     }
 
-    @DeleteMapping("/{chatroomId}/exit") // DELETE /chatrooms/{chatroomId}/{userId}/exit (채팅방 나가기)
+    @DeleteMapping("/{chatroomId}/exit") // DELETE /chatrooms/{chatroomId}/exit (채팅방 나가기)
     public void leaveChatroom(@PathVariable Long chatroomId, @AuthenticationPrincipal UserDetailsDto userDetailsDto) {
-        chatroomLeaveService.leaveChatroom(chatroomId, userDetailsDto.getId());
+        Long leftUserId = userDetailsDto.getId();
+        UserEntity user = userRepository.findById(leftUserId).orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
+        chatroomLeaveService.leaveChatroom(chatroomId, leftUserId);
     }
 }

@@ -44,8 +44,8 @@ public class NotificationEntity extends NotificationBaseEntity {
   @NotBlank
   private String message;
 
-  @OneToOne
-  @JoinColumn(name = "post_id", nullable = true)
+  @ManyToOne
+  @JoinColumn(name = "post_id", nullable = false)
   private PostEntity post;
 
   @Getter
@@ -53,7 +53,8 @@ public class NotificationEntity extends NotificationBaseEntity {
     KEYWORD("키워드"),
     POST("게시글"),
     REQUEST("요청"),
-    GROUPCHAT("단체 채팅방");
+    GROUPCHAT("단체 채팅방"),
+    DIRECTCHAT("일대일 채팅방");
 
     private final String label;
     Type(String label) {

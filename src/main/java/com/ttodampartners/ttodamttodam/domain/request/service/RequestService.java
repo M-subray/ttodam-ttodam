@@ -1,6 +1,5 @@
 package com.ttodampartners.ttodamttodam.domain.request.service;
 
-import com.ttodampartners.ttodamttodam.domain.bookmark.entity.BookmarkEntity;
 import com.ttodampartners.ttodamttodam.domain.chat.dto.event.GroupChatCreateEvent;
 import com.ttodampartners.ttodamttodam.domain.post.entity.PostEntity;
 import com.ttodampartners.ttodamttodam.domain.post.exception.PostException;
@@ -35,7 +34,7 @@ public class RequestService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public RequestEntity sendRequest(Long requestUserId, Long postId, RequestSendDto requestSendDto){
+    public RequestEntity sendRequest(Long requestUserId, Long postId){
         UserEntity requestUser = userRepository.findById(requestUserId)
                 .orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
 
@@ -49,7 +48,7 @@ public class RequestService {
             throw new RequestException(ErrorCode.POST_STATUS_FAILED);
         }
 
-        RequestEntity request = RequestSendDto.of(requestUser,post,requestSendDto);
+        RequestEntity request = RequestSendDto.of(requestUser,post);
 
         return requestRepository.save(request);
     }

@@ -1,6 +1,7 @@
 package com.ttodampartners.ttodamttodam.domain.user.entity;
 
 import com.ttodampartners.ttodamttodam.domain.keyword.entity.KeywordEntity;
+import com.ttodampartners.ttodamttodam.domain.notification.entity.NotificationEntity;
 import com.ttodampartners.ttodamttodam.domain.user.dto.model.BaseEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -62,4 +63,7 @@ public class UserEntity extends BaseEntity {
 
   @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
   private List<KeywordEntity> keyword;
+
+  @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+  private List<NotificationEntity> notification;
 }
