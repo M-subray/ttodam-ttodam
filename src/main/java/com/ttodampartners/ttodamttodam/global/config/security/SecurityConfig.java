@@ -45,6 +45,7 @@ public class SecurityConfig {
                 .requestMatchers("/notifications/**").authenticated()
                 .requestMatchers("/chatroom/**").authenticated()
                 .requestMatchers("/chatrooms/**").authenticated()
+                .requestMatchers("/chattings/").permitAll()
                 .requestMatchers("/ws-chatting/**").permitAll()
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
         );
