@@ -48,4 +48,8 @@ public class ChatroomEntity extends BaseEntity {
     public void updateLastMessage(Long lastMessageId) {
         this.lastMessageId = lastMessageId;
     }
+
+    public void updateUserCount() {
+        this.userCount -= 1;
+    }
 }

@@ -76,7 +76,7 @@ public enum ErrorCode {
   GROUP_CHATROOM_ALREADY_EXIST("단체 채팅방이 이미 존재합니다."),
   CHATROOM_CREATE_DENIED("채팅방 생성은 모집중 상태에만 가능합니다."),
   USER_CHATROOM_NOT_EXIST("해당 유저가 속한 채팅방이 존재하지 않습니다."),
-  USER_NOT_IN_CHATROOM("해당 유저가 채팅방에 속해있지 않아 채팅방을 나갈 수 없습니다."),
+  USER_NOT_IN_CHATROOM("해당 유저가 채팅방에 속해있지 않습니다."),
   CHATROOM_NOT_FOUND("채팅방이 존재하지 않습니다."),
   CHATROOM_MESSAGE_NOT_FOUND("이전 채팅 기록이 존재하지 않습니다."),
   /*
