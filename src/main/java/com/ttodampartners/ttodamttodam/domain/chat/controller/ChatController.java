@@ -79,6 +79,7 @@ public class ChatController {
             message = String.format("[%s]님이 채팅방에서 나갔습니다.", leftNickname);
         }
 
+        chatService.saveChatMessage(chatroomId, ChatMessageRequest.builder().content(message).build(), null);
         simpMessagingTemplate.convertAndSend("/chatroom/" + chatroomId, message);
 
         log.info("User nickname [{}] left the chatroom [id: {}]", leftNickname, chatroomId);
