@@ -29,6 +29,7 @@ public class ChatroomController {
     private final ChatroomCreateService chatroomCreateService;
     private final ChatroomLeaveService chatroomLeaveService;
     private final UserRepository userRepository;
+    private final ChatController chatController;
 
     @PostMapping // POST /chatrooms (채팅방 생성)
     public ResponseEntity<ChatroomResponse> createChatroom(@RequestBody ChatroomCreateRequest request, @AuthenticationPrincipal UserDetailsDto userDetailsDto) {
@@ -46,9 +47,13 @@ public class ChatroomController {
     }
 
     @DeleteMapping("/{chatroomId}/exit") // DELETE /chatrooms/{chatroomId}/exit (채팅방 나가기)
-    public void leaveChatroom(@PathVariable Long chatroomId, @AuthenticationPrincipal UserDetailsDto userDetailsDto) {
+    public ResponseEntity<String> leaveChatroom(@PathVariable Long chatroomId, @AuthenticationPrincipal UserDetailsDto userDetailsDto) {
         Long leftUserId = userDetailsDto.getId();
         UserEntity user = userRepository.findById(leftUserId).orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
         chatroomLeaveService.leaveChatroom(chatroomId, leftUserId);
+
+        chatController.sendExitMessage(chatroomId, user.getNickname());
+
+        return ResponseEntity.ok("정상적으로 채팅방 나가기가 수행되었습니다.");
     }
 }

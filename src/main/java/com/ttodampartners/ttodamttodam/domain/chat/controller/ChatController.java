@@ -32,6 +32,7 @@ import java.util.List;
 public class ChatController {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ChatroomRepository chatroomRepository;
+    private final ChatroomMemberRepository chatroomMemberRepository;
     private final ChatService chatService;
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
@@ -43,11 +44,18 @@ public class ChatController {
     @MessageMapping("/{chatroomId}/messages")
     public void chat(@DestinationVariable Long chatroomId, @Valid ChatMessageRequest request, SimpMessageHeaderAccessor accessor) {
         // 채팅방 존재 여부 확인
-        chatroomRepository.findByChatroomId(chatroomId).orElseThrow(() -> new ChatroomStringException(ErrorCode.CHATROOM_NOT_FOUND));
+        ChatroomEntity chatroom = chatroomRepository.findByChatroomId(chatroomId).orElseThrow(() -> new ChatroomStringException(ErrorCode.CHATROOM_NOT_FOUND));
 
+        // 토큰에서 유저 정보 추출
         String authToken = String.valueOf(accessor.getNativeHeader("Authorization")).substring(7);
         String userEmail = tokenProvider.parseClaims(authToken).getSubject();
         UserEntity user = userRepository.findByEmail(userEmail).orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
+
+        // 유저가 채팅방 소속이 맞는지 확인
+        if (!chatroomMemberRepository.existsByUserEntityAndChatroomEntity(user, chatroom)) {
+            throw new ChatroomStringException(ErrorCode.USER_NOT_IN_CHATROOM);
+        }
+
         // 채팅 메시지 DB 저장
         chatService.saveChatMessage(chatroomId, request, user.getId());
         // 받은 메시지를 "/chatroom/{userChatroomId}" 엔드포인트로 전송
@@ -56,4 +64,23 @@ public class ChatController {
         log.info("Message [{}] send by member: {}(id: {}) to chatting room id: {}", request.getContent(), request.getNickname(), user.getId(), chatroomId);
     }
 
+    /*
+        채팅방에서 완전히 나간 유저가 있으면 알려줌
+     */
+    @MessageMapping("/user-exit")
+    public void sendExitMessage(@RequestParam("chatroomId") Long chatroomId, @RequestParam("leftUserNickname") String leftNickname) {
+        ChatroomEntity chatroom = chatroomRepository.findByChatroomId(chatroomId).orElseThrow(() -> new ChatroomStringException(ErrorCode.CHATROOM_NOT_FOUND));
+
+        List<ChatroomMemberEntity> remainUsers = chatroomMemberRepository.findAllByChatroomEntity(chatroom);
+        String message;
+        if (remainUsers.size() == 1) {
+            message = String.format("[%s]님이 채팅방에서 나갔습니다. 더이상 해당 채팅방을 이용할 수 없습니다.", leftNickname);
+        } else {
+            message = String.format("[%s]님이 채팅방에서 나갔습니다.", leftNickname);
+        }
+
+        simpMessagingTemplate.convertAndSend("/chatroom/" + chatroomId, message);
+
+        log.info("User nickname [{}] left the chatroom [id: {}]", leftNickname, chatroomId);
+    }
 }

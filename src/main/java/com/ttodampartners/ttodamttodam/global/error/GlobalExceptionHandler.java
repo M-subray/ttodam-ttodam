@@ -103,11 +103,14 @@ public class GlobalExceptionHandler {
   }
 
   /*
-    파일 크기가 1MB 보다 큰 경우 예외 처리
+    파일 크기가 1MB 보다 큰 경우(FileSizeLimitExceededException),
+    하나의 요청이 기본 설정된 최대 용량을 초과했을 때(SizeLimitExceededException)
+    발생하는 예외 처리
    */
   @ExceptionHandler({MaxUploadSizeExceededException.class})
   protected ResponseEntity<String> handleMultipartException(MaxUploadSizeExceededException e) {
     log.error("에러코드: MaxUploadSizeExceededException, 에러 메시지: {}", e.getMessage());
     return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("1MB 미만의 파일만 업로드 가능합니다.");
   }
+
 }
