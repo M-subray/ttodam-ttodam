@@ -44,8 +44,8 @@ public class NotificationEntity extends NotificationBaseEntity {
   @NotBlank
   private String message;
 
-  @OneToOne
-  @JoinColumn(name = "post_id", nullable = true)
+  @ManyToOne
+  @JoinColumn(name = "post_id", nullable = false)
   private PostEntity post;
 
   @Getter

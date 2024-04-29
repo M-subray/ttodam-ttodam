@@ -26,8 +26,7 @@ class RequestServiceTest {
     void SEND_REQUEST_TEST(){
 
         // 테스트 참여요청 생성
-        RequestSendDto testRequest = testRequest();
-        RequestEntity request = requestService.sendRequest(1L,59L,testRequest);
+        RequestEntity request = requestService.sendRequest(1L,59L);
 
         Optional<RequestEntity> optionalRequest = requestRepository.findById(request.getRequestId());
         assertTrue(optionalRequest.isPresent());

@@ -1,5 +1,6 @@
 package com.ttodampartners.ttodamttodam.domain.post.entity;
 
+import com.ttodampartners.ttodamttodam.domain.notification.entity.NotificationEntity;
 import com.ttodampartners.ttodamttodam.domain.user.entity.UserEntity;
 import com.ttodampartners.ttodamttodam.global.config.StringListConverter;
 import jakarta.persistence.*;
@@ -83,6 +84,9 @@ public class PostEntity {
     @Column(name = "update_at", nullable = false)
     @LastModifiedDate
     private LocalDateTime updatedAt;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
+    private List<NotificationEntity> notificationEntity;
 
     @Getter
     public enum Category {
