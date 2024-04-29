@@ -68,20 +68,22 @@ public class ChatController {
         채팅방에서 완전히 나간 유저가 있으면 알려줌
      */
     @MessageMapping("/user-exit")
-    public void sendExitMessage(@RequestParam("chatroomId") Long chatroomId, @RequestParam("leftUserNickname") String leftNickname) {
+    public void sendExitMessage(@RequestParam("chatroomId") Long chatroomId, @RequestParam("leftUserId") Long leftUserId) {
         ChatroomEntity chatroom = chatroomRepository.findByChatroomId(chatroomId).orElseThrow(() -> new ChatroomStringException(ErrorCode.CHATROOM_NOT_FOUND));
+
+        UserEntity leftUser = userRepository.findById(leftUserId).orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
 
         List<ChatroomMemberEntity> remainUsers = chatroomMemberRepository.findAllByChatroomEntity(chatroom);
         String message;
         if (remainUsers.size() == 1) {
-            message = String.format("[%s]님이 채팅방에서 나갔습니다. 더이상 해당 채팅방을 이용할 수 없습니다.", leftNickname);
+            message = String.format("[%s]님이 채팅방에서 나갔습니다. 더이상 해당 채팅방을 이용할 수 없습니다.", leftUser.getNickname());
         } else {
-            message = String.format("[%s]님이 채팅방에서 나갔습니다.", leftNickname);
+            message = String.format("[%s]님이 채팅방에서 나갔습니다.", leftUser.getNickname());
         }
 
-        chatService.saveChatMessage(chatroomId, ChatMessageRequest.builder().content(message).build(), null);
+        chatService.saveChatMessage(chatroomId, ChatMessageRequest.builder().nickname("LEFT USER").content(message).build(), leftUserId);
         simpMessagingTemplate.convertAndSend("/chatroom/" + chatroomId, message);
 
-        log.info("User nickname [{}] left the chatroom [id: {}]", leftNickname, chatroomId);
+        log.info("User nickname [{}] left the chatroom [id: {}]", leftUser.getNickname(), chatroomId);
     }
 }

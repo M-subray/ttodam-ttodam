@@ -52,7 +52,7 @@ public class ChatroomController {
         UserEntity user = userRepository.findById(leftUserId).orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
         chatroomLeaveService.leaveChatroom(chatroomId, leftUserId);
 
-        chatController.sendExitMessage(chatroomId, user.getNickname());
+        chatController.sendExitMessage(chatroomId, leftUserId);
 
         return ResponseEntity.ok("정상적으로 채팅방 나가기가 수행되었습니다.");
     }
