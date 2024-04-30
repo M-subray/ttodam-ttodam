@@ -28,8 +28,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -64,17 +62,22 @@ public class PostService {
             List<String> postImgUrls = uploadImageFilesToS3(imageFiles);
 
             PostEntity post = PostCreateDto.of(user,postImgUrls,postCreateDto);
+
+            postCreateDto.getPlace();
+
+
             // 저장된 만남장소 주소정보로 위도,경도 저장
             double[] coordinates = coordinateFinderUtil.getCoordinates(postCreateDto.getPlace());
             post.setPLocationX(coordinates[1]); // 경도 설정
             post.setPLocationY(coordinates[0]); // 위도 설정
 
+
             postRepository.save(post);
             // 키워드(프로덕트 이름 리스트)로 알림 발송
             notificationService.sendNotificationForKeyword(postCreateDto, post);
             return post;
-        } catch (IOException e) {
 
+        } catch (IOException e) {
             throw new RuntimeException("위치 정보를 가져오는 동안 에러가 발생했습니다.", e);
         }
     }
@@ -100,6 +103,7 @@ public class PostService {
         return imageUrls;
     }
 
+
     //로그인된 유저의 도로명 주소(-로)를 기준으로 게시글의 만남장소를 특정하여 게시글 목록 불러오기
     @Transactional
     public List<PostListDto> getPostList() {
@@ -108,13 +112,7 @@ public class PostService {
 
         List<PostEntity> postList = postRepository.findAll();
 
-        // 유저와 동일한 도로명을 가진 게시글 필터링
-        List<PostEntity> filteredPosts = postList.stream()
-            .filter(post -> {
-                String postRoadName = roadName(post.getPlace());
-                return postRoadName.equals(userRoadName);
-            })
-            .collect(Collectors.toList());
+        List<PostEntity> filteredPosts = filterPostsByRoadName(postList, userRoadName);
 
         return filteredPosts.stream()
             .map(PostListDto::of)
@@ -130,13 +128,7 @@ public class PostService {
         PostEntity.Category currentCategory = PostEntity.Category.fromLabel(category);
         List<PostEntity> postList = postRepository.findByCategory(currentCategory);
 
-        // 유저와 동일한 도로명을 가진 게시글 필터링
-        List<PostEntity> filteredPosts = postList.stream()
-            .filter(post -> {
-                String postRoadName = roadName(post.getPlace());
-                return postRoadName.equals(userRoadName);
-            })
-            .collect(Collectors.toList());
+        List<PostEntity> filteredPosts = filterPostsByRoadName(postList, userRoadName);
 
         return filteredPosts.stream()
             .map(PostListDto::of)
@@ -155,10 +147,15 @@ public class PostService {
     }
 
     public List<PostListDto> searchPostList(String word) {
+        UserEntity user = getUser();
+
+        String userRoadName = roadName(user.getLocation());
 
         List<PostEntity> searchPostList = postRepository.findBySearch(word);
 
-        return searchPostList.stream()
+        List<PostEntity> filteredPosts = filterPostsByRoadName(searchPostList, userRoadName);
+
+        return filteredPosts.stream()
             .map(PostListDto::of)
             .collect(Collectors.toList());
     }
@@ -216,18 +213,6 @@ public class PostService {
         }
 
         return PostDetailDto.of(post, requestList, loginUserRequestStatus, bookmarkId);
-    }
-
-    // 도로명 주소에서 -로 부분 추출
-    private String roadName(String address) {
-        Pattern pattern = Pattern.compile("(\\S+로)");
-        Matcher matcher = pattern.matcher(address);
-
-        if (matcher.find()) {
-            return matcher.group();
-        } else {
-            return "";
-        }
     }
 
     @Transactional
@@ -377,5 +362,27 @@ public class PostService {
         }
 
         return user;
+    }
+
+    // 도로명 주소에서 -로 부분 추출
+    private String roadName(String address) {
+        Pattern pattern = Pattern.compile("(\\S+로)");
+        Matcher matcher = pattern.matcher(address);
+
+        if (matcher.find()) {
+            return matcher.group();
+        } else {
+            return "";
+        }
+    }
+
+    // 유저와 동일한 도로명을 가진 게시글 필터링
+    private List<PostEntity> filterPostsByRoadName(List<PostEntity> posts, String roadName) {
+        return posts.stream()
+                .filter(post -> {
+                    String postRoadName = roadName(post.getPlace());
+                    return postRoadName.equals(roadName);
+                })
+                .collect(Collectors.toList());
     }
 }
