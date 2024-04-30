@@ -17,10 +17,15 @@ public class ProfileViewService {
   public ProfileViewDto viewProfile () {
     UserEntity user = getUser();
 
+    double mannersAverage = 0.0;
+    if (user.getEvaluationNumber() != 0) {
+      mannersAverage = user.getManners() / user.getEvaluationNumber();
+    }
+
     return ProfileViewDto.builder()
         .nickname(user.getNickname())
         .profileImgUrl(user.getProfileImgUrl())
-        .manners(user.getManners())
+        .manners(mannersAverage)
         .build();
   }
 
