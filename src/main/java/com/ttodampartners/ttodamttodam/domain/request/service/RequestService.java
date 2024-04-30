@@ -41,6 +41,10 @@ public class RequestService {
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
 
+        if (post.getUser().getId() == requestUserId) {
+            throw new RequestException(ErrorCode.REQUEST_PERMISSION_DENIED);
+        }
+
         // 게시글의 상태에 따른 참여요청 응답
         if (post.getStatus() == PostEntity.Status.COMPLETED) {
             throw new RequestException(ErrorCode.POST_STATUS_COMPLETED);

@@ -12,7 +12,9 @@ import com.ttodampartners.ttodamttodam.domain.user.repository.UserRepository;
 import com.ttodampartners.ttodamttodam.domain.user.util.AuthenticationUtil;
 import com.ttodampartners.ttodamttodam.global.error.ErrorCode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
@@ -36,46 +38,42 @@ public class MannersEvaluateCheckService {
     (if 내가 글의 '작성자'라면)
     -> 나를 제외한 유저 가져오기
     (if 내가 글의 '참여자'라면)
-    -> 나를 제외한 유저 가져오기 + 작성자 entity 추가하기
+    -> 나를 제외한 유저 가져오기 + 작성자 id 및 닉네임 추가
      */
-    List<UserEntity> userEntitiesForEvaluate = getRequestList(postId, curUser, postUser);
-    // 유저 Entity 에서 유저 닉네임 만들기
-    List<String> userNicknames = userEntitiesForEvaluate.stream()
-        .map(UserEntity::getNickname)
-        .toList();
+    Map<Long, String> userIdAndNickname = getRequestList(postId, curUser, postUser);
+    List<Long> userIdList = new ArrayList<>(userIdAndNickname.keySet());
+    List<String> userNicknameList = new ArrayList<>(userIdAndNickname.values());
 
-    return MannersEvaluateCheckDto.builder().userEntities(userEntitiesForEvaluate)
-        .userNicknames(userNicknames).build();
+    return MannersEvaluateCheckDto.builder()
+        .userIdList(userIdList)
+        .userNicknameList(userNicknameList)
+        .build();
   }
 
-  private List<UserEntity> getRequestList (Long postId, UserEntity curUser, UserEntity postUser) {
-    List<RequestEntity> allByPostPostId = requestRepository.findAllByPost_PostId(postId);
-    List<RequestEntity> acceptedRequests = new ArrayList<>();
+  private Map<Long, String> getRequestList (Long postId, UserEntity curUser, UserEntity postUser) {
+    List<RequestEntity> acceptedRequests =
+        requestRepository.findAllByPost_PostIdAndRequestStatus(postId, RequestStatus.ACCEPT);
 
-    // postId로 가져온 RequestEntity중 accept인 Entity만 모으기
-    for (RequestEntity request : allByPostPostId) {
-      if (request.getRequestStatus().equals(RequestStatus.ACCEPT)) {
-        acceptedRequests.add(request);
-      }
-    }
     return getUsersFromAcceptedRequests(acceptedRequests, curUser, postUser);
   }
 
-  private List<UserEntity> getUsersFromAcceptedRequests(List<RequestEntity> acceptedRequests,
+  private Map<Long, String> getUsersFromAcceptedRequests(List<RequestEntity> acceptedRequests,
       UserEntity curUser, UserEntity postUser) {
-    List<UserEntity> userEntities = new ArrayList<>();
+    Map<Long, String> userIdAndNickname = new HashMap<>();
     for (RequestEntity request : acceptedRequests) {
       // 본인 제외하고 추가 (본인을 본인이 매너점수 평가할 수 없기에)
       if (request.getRequestUser().getId() != curUser.getId()) {
-        userEntities.add(request.getRequestUser());
+        Long userId = request.getRequestUser().getId();
+        String userNickname = request.getRequestUser().getNickname();
+        userIdAndNickname.put(userId, userNickname);
       }
     }
     // 현재 로그인 유저가 글 작성자가 아니라면 글 작성자를 추가
     // (글 작성자는 요청 목록에 없기 떄문)
     if (curUser.getId() != postUser.getId()) {
-      userEntities.add(postUser);
+      userIdAndNickname.put(postUser.getId(), postUser.getNickname());
     }
-    return userEntities;
+    return userIdAndNickname;
   }
 
   private UserEntity getUser () {

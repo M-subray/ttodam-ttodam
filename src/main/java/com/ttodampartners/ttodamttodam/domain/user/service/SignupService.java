@@ -27,6 +27,7 @@ public class SignupService {
     userRepository.save(UserEntity.builder()
         .email(signupRequestDto.getEmail())
         .password(passwordEncoder.encode(signupRequestDto.getPassword()))
+        .evaluationNumber(0L)
         .build());
   }
 

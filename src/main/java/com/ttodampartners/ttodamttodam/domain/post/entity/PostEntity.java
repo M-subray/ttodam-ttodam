@@ -88,6 +88,9 @@ public class PostEntity {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<NotificationEntity> notificationEntity;
 
+    @JoinColumn(name = "post_user_manner_evaluated")
+    private boolean postUserMannerEvaluated;
+
     @Getter
     public enum Category {
         DAILY("생활용품"),
