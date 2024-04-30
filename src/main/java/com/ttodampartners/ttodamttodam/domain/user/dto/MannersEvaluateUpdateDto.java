@@ -1,7 +1,7 @@
 package com.ttodampartners.ttodamttodam.domain.user.dto;
 
-import com.ttodampartners.ttodamttodam.domain.user.entity.UserEntity;
-import java.util.List;
+import jakarta.validation.constraints.NotEmpty;
+import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -13,7 +13,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class MannersEvaluateCheckDto {
-  List<Long> userIdList;
-  List<String> userNicknameList;
+public class MannersEvaluateUpdateDto {
+
+  @NotEmpty(message = "거래한 유저에 대해 평가해 주세요.")
+  private Map<Long, Double> mannersForMembers;
 }

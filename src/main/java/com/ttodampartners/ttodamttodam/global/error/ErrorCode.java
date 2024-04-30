@@ -20,6 +20,8 @@ public enum ErrorCode {
   SOCIAL_ACCOUNTS_IMPOSSIBLE("소셜 계정은 비밀번호 설정이 불가합니다."),
   ALREADY_LOGOUT("해당 계정은 이미 로그아웃됐습니다."),
   NOT_UPDATE_PROFILE("프로필 입력 후 사용해 주세요."),
+  ALREADY_EVALUATED_MANNERS("매너점수 평가를 이미 진행 했습니다."),
+  ADD_MANNERS_SCORE("상대에 대해 평가할 점수를 넣어주세요."),
 
   /*
   Mail Exception
@@ -76,7 +78,7 @@ public enum ErrorCode {
   GROUP_CHATROOM_ALREADY_EXIST("단체 채팅방이 이미 존재합니다."),
   CHATROOM_CREATE_DENIED("채팅방 생성은 모집중 상태에만 가능합니다."),
   USER_CHATROOM_NOT_EXIST("해당 유저가 속한 채팅방이 존재하지 않습니다."),
-  USER_NOT_IN_CHATROOM("해당 유저가 채팅방에 속해있지 않아 채팅방을 나갈 수 없습니다."),
+  USER_NOT_IN_CHATROOM("해당 유저가 채팅방에 속해있지 않습니다."),
   CHATROOM_NOT_FOUND("채팅방이 존재하지 않습니다."),
   CHATROOM_MESSAGE_NOT_FOUND("이전 채팅 기록이 존재하지 않습니다."),
   /*

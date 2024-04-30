@@ -22,3 +22,4 @@ public class MannersEvaluateCheckController {
     return ResponseEntity.ok(mannersEvaluateCheckDto);
   }
 }
+

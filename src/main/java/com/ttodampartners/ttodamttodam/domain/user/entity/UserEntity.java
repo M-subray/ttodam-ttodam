@@ -61,6 +61,8 @@ public class UserEntity extends BaseEntity {
   @Column(nullable = false, columnDefinition = "DOUBLE DEFAULT 0")
   private double manners;
 
+  private Long evaluationNumber;
+
   @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
   private List<KeywordEntity> keyword;
 
