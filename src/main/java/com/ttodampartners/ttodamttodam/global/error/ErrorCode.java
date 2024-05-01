@@ -71,6 +71,7 @@ public enum ErrorCode {
   POST_STATUS_FAILED("모집이 종료된 게시글입니다."),
   POST_STATUS_IN_PROGRESS("모집이 진행중인 게시글입니다."),
   REQUEST_PERMISSION_DENIED("해당 참여요청에 권한이 없습니다."),
+  DUPLICATE_REQUEST("이미 중복된 참여요청이 있습니다."),
 
   /*
   Chatroom Exception

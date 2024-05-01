@@ -42,9 +42,14 @@ public class RequestService {
 
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
-
+        // 본인 게시글에 참여 요청 불가
         if (post.getUser().getId().equals(requestUser.getId())) {
             throw new RequestException(ErrorCode.REQUEST_PERMISSION_DENIED);
+        }
+
+        // 중복 참여 요청 불가
+        if (requestRepository.existsByRequestUserAndPost(requestUser, post)) {
+            throw new RequestException(ErrorCode.DUPLICATE_REQUEST);
         }
 
         // 게시글의 상태에 따른 참여요청 응답
@@ -62,6 +67,7 @@ public class RequestService {
     @Transactional
     public List<ActivitiesDto> getUsersActivities() {
         UserEntity requestUser = getUser();
+
         // 로그인 유저가 참여요청 내역
         List<RequestEntity> usersActivities = requestRepository.findAllByRequestUser_Id(requestUser.getId());
 
