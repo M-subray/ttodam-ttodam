@@ -10,12 +10,15 @@ import com.ttodampartners.ttodamttodam.domain.post.repository.PostRepository;
 import com.ttodampartners.ttodamttodam.domain.user.entity.UserEntity;
 import com.ttodampartners.ttodamttodam.domain.user.exception.UserException;
 import com.ttodampartners.ttodamttodam.domain.user.repository.UserRepository;
+import com.ttodampartners.ttodamttodam.domain.user.util.AuthenticationUtil;
 import com.ttodampartners.ttodamttodam.global.error.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -28,9 +31,8 @@ public class BookmarkService {
     private final BookmarkRepository bookmarkRepository;
 
     @Transactional
-    public BookmarkEntity createBookmark(Long userId, Long postId) {
-        UserEntity user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
+    public BookmarkEntity createBookmark(Long postId) {
+        UserEntity user = getUser();
 
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
@@ -44,9 +46,10 @@ public class BookmarkService {
     }
 
     @Transactional
-    public List<BookmarkDto> getBookmarkList(Long userId) {
+    public List<BookmarkDto> getBookmarkList() {
+        UserEntity user = getUser();
 
-        List<BookmarkEntity> bookmarkList = bookmarkRepository.findByUserId(userId);
+        List<BookmarkEntity> bookmarkList = bookmarkRepository.findByUserId(user.getId());
 
         return bookmarkList.stream()
                 .map(BookmarkDto::of)
@@ -54,20 +57,34 @@ public class BookmarkService {
     }
 
     @Transactional
-    public void deleteBookmark(Long userId, Long bookmarkId) {
+    public void deleteBookmark(Long bookmarkId) {
+        UserEntity user = getUser();
+
         BookmarkEntity bookmark = bookmarkRepository.findById(bookmarkId)
                 .orElseThrow(() -> new BookmarkException(ErrorCode.NOT_FOUND_BOOKMARK));
 
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
-
         Long bookmarkUserId = bookmark.getUser().getId();
+
         // 권한 인증
-        if (!userId.equals(bookmarkUserId)) {
+        if (!user.getId().equals(bookmarkUserId)) {
             throw new BookmarkException(ErrorCode.BOOKMARK_PERMISSION_DENIED);
         }
 
         bookmarkRepository.delete(bookmark);
+    }
+
+    private UserEntity getUser () {
+        Authentication authentication = AuthenticationUtil.getAuthentication();
+        UserEntity user = userRepository.findByEmail(authentication.getName()).orElseThrow(() ->
+                new UserException(ErrorCode.NOT_FOUND_USER));
+
+        Optional<String> location = Optional.ofNullable(user.getLocation());
+
+        if (location.isEmpty() || location.get().equals("null")) {
+            throw new UserException(ErrorCode.NOT_UPDATE_PROFILE);
+        }
+
+        return user;
     }
 
     // 게시글 삭제 시 북마크도 함께 삭제
@@ -76,6 +93,7 @@ public class BookmarkService {
         List<BookmarkEntity> bookmarks = bookmarkRepository.findAllByPost_PostId(postId);
         bookmarkRepository.deleteAll(bookmarks);
     }
+
     // 회원 탈퇴 시 북마크도 함께 삭제
     @Transactional
     public void deleteBookmarksByUser(Long userId) {

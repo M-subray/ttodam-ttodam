@@ -20,30 +20,24 @@ public class BookmarkController {
 
     @PostMapping("/post/{postId}/bookmark")
     public ResponseEntity<BookmarkDto> createBookmark(
-            @AuthenticationPrincipal UserDetailsDto userDetails,
             @PathVariable Long postId
         ) {
-        Long userId = userDetails.getId();
-        return ResponseEntity.ok(BookmarkDto.of(bookmarkService.createBookmark(userId, postId)));
+        return ResponseEntity.ok(BookmarkDto.of(bookmarkService.createBookmark(postId)));
        }
 
     @GetMapping("/post/bookmark")
     public ResponseEntity<List<BookmarkDto>> getBookmarkList(
-            @AuthenticationPrincipal UserDetailsDto userDetails
     ){
-        Long userId = userDetails.getId();
-        List<BookmarkDto> bookmarkList = bookmarkService.getBookmarkList(userId);
+        List<BookmarkDto> bookmarkList = bookmarkService.getBookmarkList();
         return ResponseEntity.ok(bookmarkList);
     }
 
     @DeleteMapping("/post/bookmark/{bookmarkId}")
     public ResponseEntity<Void> deleteBookmark(
-            @AuthenticationPrincipal UserDetailsDto userDetails,
             @PathVariable Long bookmarkId
     )
     {
-        Long userId = userDetails.getId();
-        bookmarkService.deleteBookmark(userId, bookmarkId);
+        bookmarkService.deleteBookmark(bookmarkId);
         return ResponseEntity.status(OK).build();
     }
 }

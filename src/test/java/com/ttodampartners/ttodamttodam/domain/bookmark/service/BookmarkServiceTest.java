@@ -20,10 +20,9 @@ class BookmarkServiceTest {
     private BookmarkRepository bookmarkRepository;
     @Test
     void CREATE_BOOKMARK_TEST(){
-        Long userId = 2L;
         Long postId = 63L;
 
-        BookmarkEntity bookmark =  bookmarkService.createBookmark(userId, postId);
+        BookmarkEntity bookmark =  bookmarkService.createBookmark(postId);
 
         Optional<BookmarkEntity> optionalBookmark = bookmarkRepository.findById(bookmark.getBookmarkId());
         assertTrue(optionalBookmark.isPresent());
@@ -31,19 +30,18 @@ class BookmarkServiceTest {
 
     @Test
     void GET_BOOKMARK_LIST_TEST(){
-        Long userId = 3L;
 
-        List<BookmarkDto> bookmarkList = bookmarkService.getBookmarkList(userId);
+        List<BookmarkDto> bookmarkList = bookmarkService.getBookmarkList();
 
         assertEquals(2, bookmarkList.size());
     }
 
     @Test
     void DELETE_BOOKMARK_TEST(){
-        Long userId = 3L;
+
         Long bookmarkId = 3L;
 
-        bookmarkService.deleteBookmark(userId, bookmarkId);
+        bookmarkService.deleteBookmark(bookmarkId);
 
         assertFalse(bookmarkRepository.existsById(3L));
 
