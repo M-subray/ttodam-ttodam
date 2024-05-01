@@ -17,6 +17,4 @@ public interface PostRepository extends JpaRepository<PostEntity, Long> {
             "WHERE p.title LIKE %:search% OR p.content LIKE %:search% OR pr.productName LIKE %:search%")
     List<PostEntity> findBySearch(@Param("search") String search);
 
-//    @Query("SELECT p FROM Post p JOIN FETCH p.products WHERE p.title LIKE %:search%")
-//    List<Post> findBySearch(@Param("search") String search);
 }

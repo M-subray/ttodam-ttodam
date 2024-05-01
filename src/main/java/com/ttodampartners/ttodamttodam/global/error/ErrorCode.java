@@ -54,6 +54,7 @@ public enum ErrorCode {
   NOT_FOUND_PRODUCT("해당 게시글 상품을 찾지 못했습니다."),
   POST_PERMISSION_DENIED("해당 게시글에 권한이 없습니다."),
   POST_READ_PERMISSION_DENIED("본인의 거주지 주변 게시글만 조회가 가능합니다."),
+  POST_CREATE_PERMISSION_DENIED("본인의 거주지 주변 게시글만 작성이 가능합니다."),
   POST_PURCHASE_STATUS_NOT_SUCCESS("공동구매가 완료되어야 평가할 수 있습니다."),
   NOT_ACCEPTED_MEMBER("해당 게시글의 수락된 요청자가 아닙니다."),
   /*
