@@ -57,28 +57,39 @@ public class PostService {
     public PostEntity createPost(List<MultipartFile> imageFiles, PostCreateDto postCreateDto) {
         UserEntity user = getUser();
 
+        List<String> postImgUrls = null;
+
         try {
             // S3에 저장된 이미지 url
-            List<String> postImgUrls = uploadImageFilesToS3(imageFiles);
+            postImgUrls = uploadImageFilesToS3(imageFiles);
 
             PostEntity post = PostCreateDto.of(user,postImgUrls,postCreateDto);
 
-            postCreateDto.getPlace();
-
+            //로그인 유저의 주소와 게시물 만남 장소 비교
+            if (!roadName(user.getLocation()).equals(roadName(postCreateDto.getPlace()))) {
+                throw new PostException(ErrorCode.POST_CREATE_PERMISSION_DENIED);
+            }
 
             // 저장된 만남장소 주소정보로 위도,경도 저장
             double[] coordinates = coordinateFinderUtil.getCoordinates(postCreateDto.getPlace());
             post.setPLocationX(coordinates[1]); // 경도 설정
             post.setPLocationY(coordinates[0]); // 위도 설정
 
-
             postRepository.save(post);
             // 키워드(프로덕트 이름 리스트)로 알림 발송
             notificationService.sendNotificationForKeyword(postCreateDto, post);
+
+
             return post;
 
         } catch (IOException e) {
-            throw new RuntimeException("위치 정보를 가져오는 동안 에러가 발생했습니다.", e);
+            // 업로드 중 예외 발생 시 롤백 처리
+            if (postImgUrls != null) {
+                for (String postImgUrl : postImgUrls) {
+                    deleteImageFileFromS3(postImgUrl);
+                }
+            }
+            throw new RuntimeException("게시글 생성 중 에러가 발생했습니다.", e);
         }
     }
 
@@ -86,23 +97,21 @@ public class PostService {
         List<String> imageUrls = new ArrayList<>();
 
         for (MultipartFile imageFile : imageFiles) {
-            String originalFilename = imageFile.getOriginalFilename();
-            String uuid = UUID.randomUUID().toString();
-            String imageFileName = uuid + originalFilename;
+                String originalFilename = imageFile.getOriginalFilename();
+                String uuid = UUID.randomUUID().toString();
+                String imageFileName = uuid + originalFilename;
 
-            ObjectMetadata metadata = new ObjectMetadata();
-            metadata.setContentLength(imageFile.getSize());
-            metadata.setContentType(imageFile.getContentType());
+                ObjectMetadata metadata = new ObjectMetadata();
+                metadata.setContentLength(imageFile.getSize());
+                metadata.setContentType(imageFile.getContentType());
 
-            amazonS3.putObject(bucket, imageFileName, imageFile.getInputStream(), metadata);
+                amazonS3.putObject(bucket, imageFileName, imageFile.getInputStream(), metadata);
 
-            String imageUrl = amazonS3.getUrl(bucket, imageFileName).toString();
-            imageUrls.add(imageUrl);
+                String imageUrl = amazonS3.getUrl(bucket, imageFileName).toString();
+                imageUrls.add(imageUrl);
         }
-
         return imageUrls;
     }
-
 
     //로그인된 유저의 도로명 주소(-로)를 기준으로 게시글의 만남장소를 특정하여 게시글 목록 불러오기
     @Transactional

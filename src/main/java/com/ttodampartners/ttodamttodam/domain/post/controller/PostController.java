@@ -2,10 +2,8 @@ package com.ttodampartners.ttodamttodam.domain.post.controller;
 
 import com.ttodampartners.ttodamttodam.domain.post.dto.*;
 import com.ttodampartners.ttodamttodam.domain.post.service.PostService;
-import com.ttodampartners.ttodamttodam.global.dto.UserDetailsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
