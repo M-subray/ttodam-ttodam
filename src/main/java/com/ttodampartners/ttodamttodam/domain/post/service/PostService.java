@@ -113,6 +113,21 @@ public class PostService {
         return imageUrls;
     }
 
+    //게시글 목록 지도로 불러오기
+    @Transactional
+    public List<PostMapListDto> getPostMapList() {
+        UserEntity user = getUser();
+        String userRoadName = roadName(user.getLocation());
+
+        List<PostEntity> postList = postRepository.findAll();
+
+        List<PostEntity> filteredPosts = filterPostsByRoadName(postList, userRoadName);
+
+        return filteredPosts.stream()
+                .map(post -> PostMapListDto.of(user, post))
+                .collect(Collectors.toList());
+    }
+
     //로그인된 유저의 도로명 주소(-로)를 기준으로 게시글의 만남장소를 특정하여 게시글 목록 불러오기
     @Transactional
     public List<PostListDto> getPostList() {

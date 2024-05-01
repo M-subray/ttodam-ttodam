@@ -39,7 +39,7 @@ public class BookmarkService {
                 .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
 
         // 중복 불가
-        if (bookmarkRepository.existsByBookmarkUserAndPost(user, post)) {
+        if (bookmarkRepository.existsByUserAndPost(user, post)) {
             throw new RequestException(ErrorCode.DUPLICATE_BOOKMARK);
         }
 
