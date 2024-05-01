@@ -7,6 +7,7 @@ import com.ttodampartners.ttodamttodam.domain.bookmark.repository.BookmarkReposi
 import com.ttodampartners.ttodamttodam.domain.post.entity.PostEntity;
 import com.ttodampartners.ttodamttodam.domain.post.exception.PostException;
 import com.ttodampartners.ttodamttodam.domain.post.repository.PostRepository;
+import com.ttodampartners.ttodamttodam.domain.request.exception.RequestException;
 import com.ttodampartners.ttodamttodam.domain.user.entity.UserEntity;
 import com.ttodampartners.ttodamttodam.domain.user.exception.UserException;
 import com.ttodampartners.ttodamttodam.domain.user.repository.UserRepository;
@@ -36,6 +37,11 @@ public class BookmarkService {
 
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
+
+        // 중복 불가
+        if (bookmarkRepository.existsByBookmarkUserAndPost(user, post)) {
+            throw new RequestException(ErrorCode.DUPLICATE_BOOKMARK);
+        }
 
         BookmarkEntity bookmark = BookmarkEntity.builder()
                 .user(user)
