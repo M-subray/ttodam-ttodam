@@ -28,6 +28,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -138,10 +139,22 @@ public class PostService {
 
         List<PostEntity> filteredPosts = filterPostsByRoadName(postList, userRoadName);
 
+        LocalDateTime now = LocalDateTime.now();
+
+        // 마감 기한이 지난 모집중인 글 상태 변경
+        for (PostEntity post : filteredPosts) {
+            if (post.getDeadline().isBefore(now) && post.getStatus() == PostEntity.Status.IN_PROGRESS) {
+                post.setStatus(PostEntity.Status.FAILED);
+                postRepository.save(post);
+            }
+        }
+
         return filteredPosts.stream()
             .map(PostListDto::of)
             .collect(Collectors.toList());
     }
+
+
 
     @Transactional
     public List<PostListDto> getCategoryPostList(String category) {
