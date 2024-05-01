@@ -97,35 +97,52 @@ public class PostService {
         List<String> imageUrls = new ArrayList<>();
 
         for (MultipartFile imageFile : imageFiles) {
-                String originalFilename = imageFile.getOriginalFilename();
-                String uuid = UUID.randomUUID().toString();
-                String imageFileName = uuid + originalFilename;
+            String originalFilename = imageFile.getOriginalFilename();
+            String uuid = UUID.randomUUID().toString();
+            String imageFileName = uuid + originalFilename;
 
-                ObjectMetadata metadata = new ObjectMetadata();
-                metadata.setContentLength(imageFile.getSize());
-                metadata.setContentType(imageFile.getContentType());
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(imageFile.getSize());
+            metadata.setContentType(imageFile.getContentType());
 
-                amazonS3.putObject(bucket, imageFileName, imageFile.getInputStream(), metadata);
+            amazonS3.putObject(bucket, imageFileName, imageFile.getInputStream(), metadata);
 
-                String imageUrl = amazonS3.getUrl(bucket, imageFileName).toString();
-                imageUrls.add(imageUrl);
+            String imageUrl = amazonS3.getUrl(bucket, imageFileName).toString();
+            imageUrls.add(imageUrl);
         }
         return imageUrls;
     }
 
     //로그인된 유저의 도로명 주소(-로)를 기준으로 게시글의 만남장소를 특정하여 게시글 목록 불러오기
     @Transactional
-    public List<PostListDto> getPostList() {
+    public PostListWithUserAddressDto  getPostList() {
         UserEntity user = getUser();
         String userRoadName = roadName(user.getLocation());
 
         List<PostEntity> postList = postRepository.findAll();
 
         List<PostEntity> filteredPosts = filterPostsByRoadName(postList, userRoadName);
+        List<Long> bookmarkedPostIdList = bookmarkedPostIdList(user, filteredPosts);
 
-        return filteredPosts.stream()
-            .map(PostListDto::of)
+        List<PostListDto> postListDtoList = filteredPosts.stream()
+            .map(postEntity -> PostListDto.of(postEntity, bookmarkedPostIdList))
             .collect(Collectors.toList());
+
+        return PostListWithUserAddressDto.builder()
+            .postList(postListDtoList)
+            .loginUserLocation(user.getLocation())
+            .loginUserLocationX(user.getLocationX())
+            .loginUserLocationY(user.getLocationY())
+            .build();
+    }
+
+    private List<Long> bookmarkedPostIdList(UserEntity user, List<PostEntity> filteredPosts) {
+        List<Long> bookmarked = bookmarkRepository.findByUserId(user.getId()).stream()
+            .map(bookmarkEntity -> bookmarkEntity.getPost().getPostId())
+            .filter(postId -> filteredPosts.stream().anyMatch(post -> post.getPostId() == postId))
+            .collect(Collectors.toList());
+
+        return bookmarked;
     }
 
     @Transactional
@@ -388,10 +405,10 @@ public class PostService {
     // 유저와 동일한 도로명을 가진 게시글 필터링
     private List<PostEntity> filterPostsByRoadName(List<PostEntity> posts, String roadName) {
         return posts.stream()
-                .filter(post -> {
-                    String postRoadName = roadName(post.getPlace());
-                    return postRoadName.equals(roadName);
-                })
-                .collect(Collectors.toList());
+            .filter(post -> {
+                String postRoadName = roadName(post.getPlace());
+                return postRoadName.equals(roadName);
+            })
+            .collect(Collectors.toList());
     }
 }

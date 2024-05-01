@@ -27,10 +27,11 @@ public class PostController {
 
     // 게시글 조회
     @GetMapping("/post/list")
-    public ResponseEntity<List<PostListDto>> getPostList(
+    public ResponseEntity<PostListWithUserAddressDto > getPostList(
     ){
-        List<PostListDto> postList = postService.getPostList();
-        return ResponseEntity.ok(postList);
+        PostListWithUserAddressDto  postListWithUserAddressDto
+            = postService.getPostList();
+        return ResponseEntity.ok(postListWithUserAddressDto);
     }
 
     // 카테고리별 조회
