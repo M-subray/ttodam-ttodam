@@ -25,7 +25,7 @@ public class SigninService {
     UserEntity userEntity = getUserByEmail(signinRequestDto.getEmail());
 
     isMatchPassword(signinRequestDto.getPassword(), userEntity.getPassword());
-    notificationService.subscribe(userEntity.getId());
+//    notificationService.subscribe(userEntity.getId());
 
     return tokenProvider.generateToken(signinRequestDto.getEmail());
   }
