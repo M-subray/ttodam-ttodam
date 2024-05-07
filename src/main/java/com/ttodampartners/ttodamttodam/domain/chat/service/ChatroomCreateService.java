@@ -100,6 +100,7 @@ public class ChatroomCreateService {
         // 해당 채팅방에 소속된 유저(공구 주최자, 문의자)의 프로필 정보 리스트
         List<ChatroomProfileResponse> profileList = getChatroomProfiles(members);
 
+        // 게시글 작성자에게 알림
         notificationService.sendNotificationForDirectChat(post, host);
 
         return ChatroomResponse.builder()

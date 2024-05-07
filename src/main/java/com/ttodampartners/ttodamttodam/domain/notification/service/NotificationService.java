@@ -38,7 +38,7 @@ public class NotificationService {
   private final KeywordRepository keywordRepository;
   private final NotificationRepository notificationRepository;
 
-  public void subscribe(Long userId) {
+  public TokenSseEmitter subscribe(Long userId) {
     // 현재 클라이언트를 위한 sseEmitter 객체 생성 (만료시간 한시간 설정)
     TokenSseEmitter sseEmitter = new TokenSseEmitter(EXPIRE_TIME);
     Date now = new Date();
@@ -47,7 +47,7 @@ public class NotificationService {
 
     // 연결
     try {
-      sseEmitter.send(SseEmitter.event().name("connect")); // 클라이언트에게 이벤트 전송
+      sseEmitter.send(SseEmitter.event().name("connect").data("SSE 연결")); // 클라이언트에게 이벤트 전송
     } catch (IOException e) {
       throw new NotificationException(ErrorCode.SSE_SEND_FAILED);
     }
@@ -63,6 +63,8 @@ public class NotificationService {
       log.error("SSE 연결 오류 발생 (userId: {})", userId, e);
       sseEmitters.remove(userId);
     });
+
+    return sseEmitter;
   }
 
   public void sendNotificationForKeyword (PostCreateDto postCreateDto, PostEntity post) {
