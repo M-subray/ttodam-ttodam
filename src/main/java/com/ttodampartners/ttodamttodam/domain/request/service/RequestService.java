@@ -13,13 +13,16 @@ import com.ttodampartners.ttodamttodam.domain.request.repository.RequestReposito
 import com.ttodampartners.ttodamttodam.domain.user.entity.UserEntity;
 import com.ttodampartners.ttodamttodam.domain.user.exception.UserException;
 import com.ttodampartners.ttodamttodam.domain.user.repository.UserRepository;
+import com.ttodampartners.ttodamttodam.domain.user.util.AuthenticationUtil;
 import com.ttodampartners.ttodamttodam.global.error.ErrorCode;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -34,15 +37,19 @@ public class RequestService {
     private final ApplicationEventPublisher eventPublisher;
 
     @Transactional
-    public RequestEntity sendRequest(Long requestUserId, Long postId){
-        UserEntity requestUser = userRepository.findById(requestUserId)
-                .orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
+    public RequestEntity sendRequest(Long postId){
+        UserEntity requestUser = getUser();
 
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
-
-        if (post.getUser().getId() == requestUserId) {
+        // 본인 게시글에 참여 요청 불가
+        if (post.getUser().getId().equals(requestUser.getId())) {
             throw new RequestException(ErrorCode.REQUEST_PERMISSION_DENIED);
+        }
+
+        // 중복 참여 요청 불가
+        if (requestRepository.existsByRequestUserAndPost(requestUser, post)) {
+            throw new RequestException(ErrorCode.DUPLICATE_REQUEST);
         }
 
         // 게시글의 상태에 따른 참여요청 응답
@@ -58,10 +65,11 @@ public class RequestService {
     }
 
     @Transactional
-    public List<ActivitiesDto> getUsersActivities(Long requestUserId) {
+    public List<ActivitiesDto> getUsersActivities() {
+        UserEntity requestUser = getUser();
 
         // 로그인 유저가 참여요청 내역
-        List<RequestEntity> usersActivities = requestRepository.findAllByRequestUser_Id(requestUserId);
+        List<RequestEntity> usersActivities = requestRepository.findAllByRequestUser_Id(requestUser.getId());
 
         return usersActivities.stream()
                 .map(ActivitiesDto::of)
@@ -69,17 +77,16 @@ public class RequestService {
     }
 
     @Transactional
-    public void deleteRequest(Long userId, Long requestId) {
+    public void deleteRequest(Long requestId) {
+        UserEntity user = getUser();
+
         RequestEntity request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new RequestException(ErrorCode.NOT_FOUND_REQUEST));
 
-        UserEntity requestUser = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
-
-        Long requestUserId = requestUser.getId();
+        Long requestUserId = request.getRequestUser().getId();
 
         // 권한 인증
-        if (!userId.equals(requestUserId)) {
+        if (!user.getId().equals(requestUserId)){
             throw new RequestException(ErrorCode.REQUEST_PERMISSION_DENIED);
         }
 
@@ -87,14 +94,16 @@ public class RequestService {
     }
 
     @Transactional
-    public List<RequestDto> getRequestList(Long userId, Long postId) {
+    public List<RequestDto> getRequestList(Long postId) {
+        UserEntity user = getUser();
+
         List<RequestEntity> requestList = requestRepository.findAllByPost_PostId(postId);
 
         PostEntity post = postRepository.findById(postId)
                 .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
 
         // 주최자 인증
-        validateAuthority(userId, post);
+        validateAuthority(user, post);
 
         return requestList.stream()
                 .map(RequestDto::of)
@@ -102,14 +111,16 @@ public class RequestService {
     }
 
     @Transactional
-    public RequestEntity updateRequestStatus(Long userId, Long requestId,String requestStatus){
+    public RequestEntity updateRequestStatus(Long requestId,String requestStatus){
+        UserEntity user = getUser();
+
         RequestEntity  request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new RequestException(ErrorCode.NOT_FOUND_REQUEST));
 
         PostEntity post = request.getPost();
 
         // 주최자 인증
-        validateAuthority(userId, post);
+        validateAuthority(user, post);
 
         if (post.getStatus() == PostEntity.Status.COMPLETED) {
             throw new RequestException(ErrorCode.POST_STATUS_COMPLETED);
@@ -160,14 +171,24 @@ public class RequestService {
             );
         }
     }
+    private UserEntity getUser () {
+        Authentication authentication = AuthenticationUtil.getAuthentication();
+        UserEntity user = userRepository.findByEmail(authentication.getName()).orElseThrow(() ->
+                new UserException(ErrorCode.NOT_FOUND_USER));
 
-    private void validateAuthority(Long userId, PostEntity post) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
+        Optional<String> location = Optional.ofNullable(user.getLocation());
 
+        if (location.isEmpty() || location.get().equals("null")) {
+            throw new UserException(ErrorCode.NOT_UPDATE_PROFILE);
+        }
+
+        return user;
+    }
+
+    private void validateAuthority(UserEntity user, PostEntity post) {
         Long postAuthorId = post.getUser().getId();
 
-        if (!userId.equals(postAuthorId)) {
+        if (!user.getId().equals(postAuthorId)) {
             throw new PostException(ErrorCode.POST_PERMISSION_DENIED);
         }
     }

@@ -25,12 +25,19 @@ public class PostController {
         return ResponseEntity.ok(PostDto.of(postService.createPost(imageFiles, postCreateDto)));
     }
 
-    // 게시글 조회
     @GetMapping("/post/list")
-    public ResponseEntity<PostListWithUserAddressDto > getPostList(
+    public ResponseEntity<List<PostListDto>> getPostList(
+    ){
+        List<PostListDto> postList = postService.getPostList();
+        return ResponseEntity.ok(postList);
+    }
+
+    // 지도 게시글 조회
+    @GetMapping("/post/map/list")
+    public ResponseEntity<PostListWithUserAddressDto> getPostMapList(
     ){
         PostListWithUserAddressDto  postListWithUserAddressDto
-            = postService.getPostList();
+            = postService.getPostMapList();
         return ResponseEntity.ok(postListWithUserAddressDto);
     }
 

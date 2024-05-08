@@ -28,6 +28,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -115,32 +116,58 @@ public class PostService {
 
     //로그인된 유저의 도로명 주소(-로)를 기준으로 게시글의 만남장소를 특정하여 게시글 목록 불러오기
     @Transactional
-    public PostListWithUserAddressDto  getPostList() {
+    public List<PostListDto> getPostList() {
         UserEntity user = getUser();
         String userRoadName = roadName(user.getLocation());
 
         List<PostEntity> postList = postRepository.findAll();
 
         List<PostEntity> filteredPosts = filterPostsByRoadName(postList, userRoadName);
+
+        return filteredPosts.stream()
+                .map(PostListDto::of)
+                .collect(Collectors.toList());
+    }
+
+    //게시글 목록 지도로 불러오기
+    @Transactional
+    public PostListWithUserAddressDto  getPostMapList() {
+        UserEntity user = getUser();
+        String userRoadName = roadName(user.getLocation());
+
+        List<PostEntity> postList = postRepository.findAll();
+
+        List<PostEntity> filteredPosts = filterPostsByRoadName(postList, userRoadName);
+
+        LocalDateTime now = LocalDateTime.now();
+
+        // 마감 기한이 지난 모집중인 글 상태 변경
+        for (PostEntity post : filteredPosts) {
+            if (post.getDeadline().isBefore(now) && post.getStatus() == PostEntity.Status.IN_PROGRESS) {
+                post.setStatus(PostEntity.Status.FAILED);
+                postRepository.save(post);
+            }
+        }
+
         List<Long> bookmarkedPostIdList = bookmarkedPostIdList(user, filteredPosts);
 
         List<PostListDto> postListDtoList = filteredPosts.stream()
-            .map(postEntity -> PostListDto.of(postEntity, bookmarkedPostIdList))
-            .collect(Collectors.toList());
+                .map(postEntity -> PostListDto.of(postEntity, bookmarkedPostIdList))
+                .collect(Collectors.toList());
 
         return PostListWithUserAddressDto.builder()
-            .postList(postListDtoList)
-            .loginUserLocation(user.getLocation())
-            .loginUserLocationX(user.getLocationX())
-            .loginUserLocationY(user.getLocationY())
-            .build();
+                .postList(postListDtoList)
+                .loginUserLocation(user.getLocation())
+                .loginUserLocationX(user.getLocationX())
+                .loginUserLocationY(user.getLocationY())
+                .build();
     }
 
     private List<Long> bookmarkedPostIdList(UserEntity user, List<PostEntity> filteredPosts) {
         List<Long> bookmarked = bookmarkRepository.findByUserId(user.getId()).stream()
-            .map(bookmarkEntity -> bookmarkEntity.getPost().getPostId())
-            .filter(postId -> filteredPosts.stream().anyMatch(post -> post.getPostId() == postId))
-            .collect(Collectors.toList());
+                .map(bookmarkEntity -> bookmarkEntity.getPost().getPostId())
+                .filter(postId -> filteredPosts.stream().anyMatch(post -> post.getPostId() == postId))
+                .collect(Collectors.toList());
 
         return bookmarked;
     }
@@ -157,8 +184,8 @@ public class PostService {
         List<PostEntity> filteredPosts = filterPostsByRoadName(postList, userRoadName);
 
         return filteredPosts.stream()
-            .map(PostListDto::of)
-            .collect(Collectors.toList());
+                .map(PostListDto::of)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -168,8 +195,8 @@ public class PostService {
         List<PostEntity> usersPostList = postRepository.findByUserId(user.getId());
 
         return usersPostList.stream()
-            .map(PostListDto::of)
-            .collect(Collectors.toList());
+                .map(PostListDto::of)
+                .collect(Collectors.toList());
     }
 
     public List<PostListDto> searchPostList(String word) {
@@ -182,8 +209,8 @@ public class PostService {
         List<PostEntity> filteredPosts = filterPostsByRoadName(searchPostList, userRoadName);
 
         return filteredPosts.stream()
-            .map(PostListDto::of)
-            .collect(Collectors.toList());
+                .map(PostListDto::of)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -193,13 +220,13 @@ public class PostService {
         String userRoadName = roadName(user.getLocation());
 
         PostEntity post = postRepository.findById(postId)
-            .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
+                .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
 
         Long bookmarkId = 0L;
 
         // 북마크 확인
         Optional<BookmarkEntity> bookmarkOptional =
-            bookmarkRepository.findByPost_PostIdAndUserId(postId, user.getId());
+                bookmarkRepository.findByPost_PostIdAndUserId(postId, user.getId());
         if (bookmarkOptional.isPresent()) {
             // 북마크가 존재하면 북마크 ID를 받아옴
             bookmarkId = bookmarkOptional.get().getBookmarkId();
@@ -246,7 +273,7 @@ public class PostService {
         UserEntity user = getUser();
 
         PostEntity post = postRepository.findById(postId)
-            .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
+                .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
 
         validateAuthority(user, post);
 
@@ -303,8 +330,8 @@ public class PostService {
 
         for (ProductUpdateDto productUpdateDto : products) {
             ProductEntity product = post.getProducts().stream()
-                .filter(pi -> pi.getProductId().equals(productUpdateDto.getProductId()))
-                .findFirst().orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_PRODUCT));
+                    .filter(pi -> pi.getProductId().equals(productUpdateDto.getProductId()))
+                    .findFirst().orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_PRODUCT));
             product.setProductName(productUpdateDto.getProductName());
             product.setCount(productUpdateDto.getCount());
             product.setPrice(productUpdateDto.getPrice());
@@ -316,7 +343,7 @@ public class PostService {
     public PostEntity updatePurchaseStatus(Long postId, String purchaseStatus){
         UserEntity user = getUser();
         PostEntity post = postRepository.findById(postId)
-            .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
+                .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
 
         // 주최자 인증
         validateAuthority(user, post);
@@ -339,7 +366,7 @@ public class PostService {
         UserEntity user = getUser();
 
         PostEntity post = postRepository.findById(postId)
-            .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
+                .orElseThrow(() -> new PostException(ErrorCode.NOT_FOUND_POST));
 
         validateAuthority(user, post);
 
@@ -379,7 +406,7 @@ public class PostService {
     private UserEntity getUser () {
         Authentication authentication = AuthenticationUtil.getAuthentication();
         UserEntity user = userRepository.findByEmail(authentication.getName()).orElseThrow(() ->
-            new UserException(ErrorCode.NOT_FOUND_USER));
+                new UserException(ErrorCode.NOT_FOUND_USER));
 
         Optional<String> location = Optional.ofNullable(user.getLocation());
 
@@ -405,10 +432,11 @@ public class PostService {
     // 유저와 동일한 도로명을 가진 게시글 필터링
     private List<PostEntity> filterPostsByRoadName(List<PostEntity> posts, String roadName) {
         return posts.stream()
-            .filter(post -> {
-                String postRoadName = roadName(post.getPlace());
-                return postRoadName.equals(roadName);
-            })
-            .collect(Collectors.toList());
+                .filter(post -> {
+                    String postRoadName = roadName(post.getPlace());
+                    return postRoadName.equals(roadName);
+                })
+                .collect(Collectors.toList());
     }
 }
+
