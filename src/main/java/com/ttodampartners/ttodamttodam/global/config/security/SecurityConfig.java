@@ -35,12 +35,7 @@ public class SecurityConfig {
                 .requestMatchers("/users/signin/**").permitAll()
                 .requestMatchers("/users/signup/**").permitAll()
                 .requestMatchers("/login/**").permitAll()
-<<<<<<< HEAD
-                .requestMatchers("/post/**").permitAll()
-                .requestMatchers("/post/search").permitAll()
-=======
                 .requestMatchers("/post/**").authenticated()
->>>>>>> dev
                 .requestMatchers("/request/**").authenticated()
                 .requestMatchers("/users/{userId}/**").authenticated()
                 .requestMatchers("/users/**").authenticated()
