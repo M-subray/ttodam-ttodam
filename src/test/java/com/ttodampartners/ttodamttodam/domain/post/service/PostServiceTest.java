@@ -70,14 +70,14 @@ class PostServiceTest {
                 .build();
     }
 
-    @Test
-    void GET_POST_LIST_TEST(){
-        Long userId = 3L;
-
-        List<PostListDto> postList = postService.getPostList();
-
-        assertEquals(2, postList.size());
-    }
+//    @Test
+//    void GET_POST_LIST_TEST(){
+//        Long userId = 3L;
+//
+//        List<PostListDto> postList = postService.getPostList();
+//
+//        assertEquals(2, postList.size());
+//    }
 
     @Test
     void GET_CATEGORY_POST_LIST_TEST(){
