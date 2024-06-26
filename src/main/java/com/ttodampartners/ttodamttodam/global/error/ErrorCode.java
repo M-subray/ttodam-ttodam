@@ -19,6 +19,9 @@ public enum ErrorCode {
   PERMISSION_DENIED("권한이 없습니다."),
   SOCIAL_ACCOUNTS_IMPOSSIBLE("소셜 계정은 비밀번호 설정이 불가합니다."),
   ALREADY_LOGOUT("해당 계정은 이미 로그아웃됐습니다."),
+  NOT_UPDATE_PROFILE("프로필 입력 후 사용해 주세요."),
+  ALREADY_EVALUATED_MANNERS("매너점수 평가를 이미 진행 했습니다."),
+  ADD_MANNERS_SCORE("상대에 대해 평가할 점수를 넣어주세요."),
 
   /*
   Mail Exception
@@ -51,6 +54,7 @@ public enum ErrorCode {
   NOT_FOUND_PRODUCT("해당 게시글 상품을 찾지 못했습니다."),
   POST_PERMISSION_DENIED("해당 게시글에 권한이 없습니다."),
   POST_READ_PERMISSION_DENIED("본인의 거주지 주변 게시글만 조회가 가능합니다."),
+  POST_CREATE_PERMISSION_DENIED("본인의 거주지 주변 게시글만 작성이 가능합니다."),
   POST_PURCHASE_STATUS_NOT_SUCCESS("공동구매가 완료되어야 평가할 수 있습니다."),
   NOT_ACCEPTED_MEMBER("해당 게시글의 수락된 요청자가 아닙니다."),
   /*
@@ -58,6 +62,7 @@ public enum ErrorCode {
    */
   NOT_FOUND_BOOKMARK("해당 북마크를 찾을 수 없습니다."),
   BOOKMARK_PERMISSION_DENIED("해당 북마크에 권한이 없습니다."),
+  DUPLICATE_BOOKMARK("이미 북마크 처리되었습니다."),
 
   /*
   Request Exception
@@ -67,6 +72,7 @@ public enum ErrorCode {
   POST_STATUS_FAILED("모집이 종료된 게시글입니다."),
   POST_STATUS_IN_PROGRESS("모집이 진행중인 게시글입니다."),
   REQUEST_PERMISSION_DENIED("해당 참여요청에 권한이 없습니다."),
+  DUPLICATE_REQUEST("이미 중복된 참여요청이 있습니다."),
 
   /*
   Chatroom Exception
@@ -75,7 +81,7 @@ public enum ErrorCode {
   GROUP_CHATROOM_ALREADY_EXIST("단체 채팅방이 이미 존재합니다."),
   CHATROOM_CREATE_DENIED("채팅방 생성은 모집중 상태에만 가능합니다."),
   USER_CHATROOM_NOT_EXIST("해당 유저가 속한 채팅방이 존재하지 않습니다."),
-  USER_NOT_IN_CHATROOM("해당 유저가 채팅방에 속해있지 않아 채팅방을 나갈 수 없습니다."),
+  USER_NOT_IN_CHATROOM("해당 유저가 채팅방에 속해있지 않습니다."),
   CHATROOM_NOT_FOUND("채팅방이 존재하지 않습니다."),
   CHATROOM_MESSAGE_NOT_FOUND("이전 채팅 기록이 존재하지 않습니다."),
   /*

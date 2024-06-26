@@ -35,8 +35,6 @@ public class ChatroomEnterService {
 
         if (CollectionUtils.isEmpty(chatroomMemberEntities)) {
             throw new ChatroomStringException("채팅방에 소속된 유저가 없습니다.");
-        } else if (chatroomMemberEntities.size() != chatroom.getUserCount()) {
-            log.info("채팅방 인원 수에 차이가 있습니다. 채팅방에서 나간 유저가 있는지 확인해주세요.");
         }
 
         List<ChatroomProfileResponse> profileList = chatroomMemberEntities.stream().map(
@@ -55,9 +53,7 @@ public class ChatroomEnterService {
         }
 
         List<ChatMessageEntity> chatMessageEntities = chatMessageRepository.findAllByChatroomEntity(chatroom);
-        List<ChatMessageResponse> chatMessageResponses = chatMessageEntities.stream().map(
-                ChatMessageEntity::getChatMessageResponse
-        ).toList();
-        return chatMessageResponses;
+
+        return chatMessageEntities.stream().map(ChatMessageEntity::getChatMessageResponse).toList();
     }
 }

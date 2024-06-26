@@ -38,16 +38,16 @@ public class NotificationService {
   private final KeywordRepository keywordRepository;
   private final NotificationRepository notificationRepository;
 
-  public void subscribe(Long userId) {
+  public TokenSseEmitter subscribe(Long userId) {
     // 현재 클라이언트를 위한 sseEmitter 객체 생성 (만료시간 한시간 설정)
     TokenSseEmitter sseEmitter = new TokenSseEmitter(EXPIRE_TIME);
     Date now = new Date();
-//    sseEmitter.setExpiredDate(now.getTime() + EXPIRE_TIME);
+    // sseEmitter.setExpiredDate(now.getTime() + EXPIRE_TIME);
     sseEmitter.setExpiredDate(now.getTime() + EXPIRE_TIME);
 
     // 연결
     try {
-      sseEmitter.send(SseEmitter.event().name("connect")); // 클라이언트에게 이벤트 전송
+      sseEmitter.send(SseEmitter.event().name("connect").data("SSE 연결")); // 클라이언트에게 이벤트 전송
     } catch (IOException e) {
       throw new NotificationException(ErrorCode.SSE_SEND_FAILED);
     }
@@ -63,6 +63,8 @@ public class NotificationService {
       log.error("SSE 연결 오류 발생 (userId: {})", userId, e);
       sseEmitters.remove(userId);
     });
+
+    return sseEmitter;
   }
 
   public void sendNotificationForKeyword (PostCreateDto postCreateDto, PostEntity post) {
@@ -112,13 +114,13 @@ public class NotificationService {
     for (UserEntity member: members) {
       SseEmitter sseEmitter = getSseEmitter(member.getId());
       String message = String.format("희망하셨던 %s 게시글에 대한 공동구매가 성사되어 단체 채팅방이 생성되었습니다. 채팅방 목록에서 확인해보세요!", post.getTitle());
-      saveNotificationForGroupChat(member, message);
+      saveNotificationForGroupChat(member, message, post);
 
       if (sseEmitter != null) {
         try {
           sseEmitter.send(SseEmitter.event().
-              name("notification").
-              data(Map.of("notificationMessage", message)));
+                  name("notification").
+                  data(Map.of("notificationMessage", message)));
         } catch (IOException e) {
           throw new NotificationException(ErrorCode.SSE_SEND_FAILED);
         }
@@ -126,12 +128,37 @@ public class NotificationService {
     }
   }
 
-  private void saveNotificationForGroupChat(UserEntity member, String message) {
+  private void saveNotificationForGroupChat(UserEntity member, String message, PostEntity post) {
     notificationRepository.save(NotificationEntity.builder()
         .user(member)
         .message(message)
         .type(Type.GROUPCHAT)
+        .post(post)
         .build());
+  }
+
+  public void sendNotificationForDirectChat(PostEntity post, UserEntity host) {
+    SseEmitter sseEmitter = getSseEmitter(host.getId());
+    String message = String.format("%s 게시글에 대한 문의 메시지가 도착했습니다. 채팅방 목록에서 확인해보세요!", post.getTitle());
+    saveNotificationForDirectChat(host, message, post);
+    if (sseEmitter != null) {
+      try {
+        sseEmitter.send(SseEmitter.event().
+                name("notification").
+                data(Map.of("notificationMessage", message)));
+      } catch (IOException e) {
+        throw new NotificationException(ErrorCode.SSE_SEND_FAILED);
+      }
+    }
+  }
+
+  private void saveNotificationForDirectChat(UserEntity host, String message, PostEntity post) {
+    notificationRepository.save(NotificationEntity.builder()
+            .user(host)
+            .message(message)
+            .type(Type.DIRECTCHAT)
+            .post(post)
+            .build());
   }
 
   @Scheduled(fixedRate = 900000)

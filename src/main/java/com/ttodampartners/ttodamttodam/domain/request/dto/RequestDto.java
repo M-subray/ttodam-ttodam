@@ -16,6 +16,7 @@ public class RequestDto {
     private Long requestId;
     private Long requestUserId;
     private String requestUserNickname;
+    private double requestUserManners;
     private RequestEntity.RequestStatus requestStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -24,6 +25,7 @@ public class RequestDto {
         return RequestDto.builder()
                 .requestId(requestEntity.getRequestId())
                 .requestUserNickname(requestEntity.getRequestUser().getNickname())
+                .requestUserManners(requestEntity.getRequestUser().getManners())
                 .requestUserId(requestEntity.getRequestUser().getId())
                 .requestStatus(requestEntity.getRequestStatus())
                 .createdAt(requestEntity.getCreatedAt())

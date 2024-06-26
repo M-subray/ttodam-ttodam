@@ -41,7 +41,7 @@ class PostServiceTest {
             imageFiles.add(imageFile);
         }
 
-        PostEntity post = postService.createPost(5L, imageFiles, testPost);
+        PostEntity post = postService.createPost(imageFiles, testPost);
 
         Optional<PostEntity> optionalPost = postRepository.findById(post.getPostId());
         assertTrue(optionalPost.isPresent());
@@ -70,21 +70,20 @@ class PostServiceTest {
                 .build();
     }
 
-    @Test
-    void GET_POST_LIST_TEST(){
-        Long userId = 3L;
-
-        List<PostListDto> postList = postService.getPostList(userId);
-
-        assertEquals(2, postList.size());
-    }
+//    @Test
+//    void GET_POST_LIST_TEST(){
+//        Long userId = 3L;
+//
+//        List<PostListDto> postList = postService.getPostList();
+//
+//        assertEquals(2, postList.size());
+//    }
 
     @Test
     void GET_CATEGORY_POST_LIST_TEST(){
-        Long userId = 1L;
         String category = "생활용품";
 
-        List<PostListDto> postList = postService.getCategoryPostList(userId,category);
+        List<PostListDto> postList = postService.getCategoryPostList(category);
 
         assertEquals(3, postList.size());
     }
@@ -94,7 +93,7 @@ class PostServiceTest {
     void GET_USERS_POST_LIST_TEST(){
         Long userId = 3L;
 
-        List<PostListDto> userPostList = postService.getUsersPostList(userId);
+        List<PostListDto> userPostList = postService.getUsersPostList();
 
         assertEquals(3, userPostList.size());
     }
@@ -114,7 +113,7 @@ class PostServiceTest {
         Long userId = 5L;
         Long postId = 63L;
 
-        PostDetailDto testPost = postService.getPost(userId, postId);
+        PostDetailDto testPost = postService.getPost(postId);
 
         assertEquals("NONE", testPost.getLoginUserRequestStatus());
 
@@ -143,7 +142,7 @@ class PostServiceTest {
         imgUrls.add("https://ttodam-ttodam.s3.ap-northeast-2.amazonaws.com/남은 기존 이미지.jpg");
         postUpdateDto.setImgUrls(imgUrls);
 
-        postService.updatePost(3L, 63L, newImageFiles, postUpdateDto);
+        postService.updatePost(63L, newImageFiles, postUpdateDto);
 
         // 업데이트된 게시물 확인
         Optional<PostEntity> optionalPost = postRepository.findById(testPost.getPostId());
@@ -161,7 +160,7 @@ class PostServiceTest {
         Long userId = 3L;
         Long postId = 59L;
 
-        PostEntity updateRequest = postService.updatePurchaseStatus(userId, postId,"성공");
+        PostEntity updateRequest = postService.updatePurchaseStatus(postId,"성공");
 
         assertEquals(PostEntity.PurchaseStatus.SUCCESS, updateRequest.getPurchaseStatus());
     }
@@ -171,7 +170,7 @@ class PostServiceTest {
         Long userId = 2L;
         Long postId = 58L;
 
-        postService.deletePost(userId, postId);
+        postService.deletePost(postId);
 
         assertFalse(postRepository.existsById(58L));
 

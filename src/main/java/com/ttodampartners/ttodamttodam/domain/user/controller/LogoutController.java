@@ -1,7 +1,6 @@
 package com.ttodampartners.ttodamttodam.domain.user.controller;
 
 import com.ttodampartners.ttodamttodam.domain.user.service.LogoutService;
-import com.ttodampartners.ttodamttodam.global.config.security.JwtAuthenticationFilter;
 import com.ttodampartners.ttodamttodam.global.config.security.TokenProvider;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

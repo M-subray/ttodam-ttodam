@@ -12,8 +12,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import java.time.LocalDateTime;
 
 
-@Getter
+
 @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @EnableJpaAuditing
@@ -29,6 +30,9 @@ public class RequestEntity {
     @ManyToOne
     @JoinColumn(name = "request_user", nullable = false)
     private UserEntity requestUser;
+
+    @JoinColumn(name = "request_member_manner_evaluated")
+    private boolean requestMemberMannerEvaluated;
 
     @ManyToOne
     @JoinColumn(name = "post_id", nullable = false)

@@ -18,7 +18,8 @@ public class PostDetailDto {
     private Long bookmarkId;
     private List<RequestDto> requestList;
 
-    public static PostDetailDto of(PostEntity postEntity, List<RequestEntity> requestEntities, String loginUserRequestStatus, Long bookmarkId) {
+    public static PostDetailDto of(PostEntity postEntity, List<RequestEntity> requestEntities,
+        String loginUserRequestStatus, Long bookmarkId) {
         return PostDetailDto.builder()
                 .post(PostDto.of(postEntity))
                 .requestList(requestEntities.stream()

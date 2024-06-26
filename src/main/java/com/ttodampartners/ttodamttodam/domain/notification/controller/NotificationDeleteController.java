@@ -12,7 +12,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class NotificationDeleteController {
   private final NotificationDeleteService notificationDeleteService;
 
-  @DeleteMapping("/notifications/{notificationId}")
+
+  @DeleteMapping("/notifications/delete")
   public ResponseEntity<?> deleteNotification(@RequestParam Long notificationId) {
     notificationDeleteService.deleteNotification(notificationId);
 

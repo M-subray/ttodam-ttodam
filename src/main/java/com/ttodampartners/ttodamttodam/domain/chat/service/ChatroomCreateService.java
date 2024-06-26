@@ -60,6 +60,10 @@ public class ChatroomCreateService {
         // 게시글 작성자
         UserEntity host = userRepository.findById(post.getUser().getId()).orElseThrow(() -> new UserException(ErrorCode.NOT_FOUND_USER));
 
+        if (host.getId().equals(user.getId())) {
+            throw new ChatroomStringException("게시글 작성자입니다.");
+        }
+
         // 이미 user가 해당 post에 일대일 채팅방 생성한 적 있는지 체크
         List<ChatroomEntity> chatroomEntities = chatroomRepository.findByPostEntity(post); // 이 post에서 생성된 채팅방 리스트
         ErrorCode code = CHATROOM_ALREADY_EXIST;
@@ -95,6 +99,9 @@ public class ChatroomCreateService {
         }
         // 해당 채팅방에 소속된 유저(공구 주최자, 문의자)의 프로필 정보 리스트
         List<ChatroomProfileResponse> profileList = getChatroomProfiles(members);
+
+        // 게시글 작성자에게 알림
+        notificationService.sendNotificationForDirectChat(post, host);
 
         return ChatroomResponse.builder()
                 .chatroomId(chatroom.getChatroomId())
@@ -137,6 +144,7 @@ public class ChatroomCreateService {
             throw new IllegalArgumentException("단체 채팅방 인원 수가 맞지 않습니다.");
         }
 
+        // 개인 채팅방 생성 알림 to 게시글 작성자
         List<ChatroomMemberEntity> chatroomMemberEntities = saveChatroomMembers(members, chatroom);
 
         // 단체 채팅방 생성 알림
@@ -153,6 +161,7 @@ public class ChatroomCreateService {
                         ChatroomMemberEntity.builder()
                                 .chatroomEntity(chatroom)
                                 .userEntity(member)
+                                .chatActive(true)
                                 .build()
                 )
         ).toList();
